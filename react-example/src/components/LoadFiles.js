@@ -10,19 +10,26 @@ function onFileSelect(files) {
   for(let file of files) DataAsync.LoadFile(file);
 }
 
-function renderLoadingProgress() {
-  const filenames = this.props.fileNames.map((name) => {
-    return <div key={name}>{name} - loading...</div>;
-  });
-
+function renderFileState() {
+  const fileStates = [];
+  for(let fileName of Object.keys(this.props.fileStates)) {
+    let message = "Loading...";
+    if (this.props.fileStates[fileName] !== true) {
+      message = `Error: ${this.props.fileStates[fileName]}`;
+    }
+    fileStates.push(
+      <div key={fileName}>{fileName} - {message}</div>
+    );
+  }
   return (
     <div>
-      {filenames}
+      {fileStates}
     </div>
   );
 }
 
 function renderUploadButton() {
+  if (this.props.busy) return <div>Loading...</div>;
   const handleFiles = onFileSelect.bind(this);
   const types = [".jqrdd", ".jqrdl", ".jqrd.sourcemap"];
   return (
@@ -40,18 +47,23 @@ function renderUploadButton() {
 
 class LoadFiles extends Component {
   render() {
-    if (this.props.busy) {
-      return renderLoadingProgress.call(this);
-    } else {
-      return renderUploadButton.call(this);
-    }
+    return (
+      <div>
+        {renderFileState.call(this)}
+        {renderUploadButton.call(this)}
+      </div>
+    )
   }
 } 
 
 function mapStateToProps(state) {
+  const fileStates = {};
+  for(let fileName of state.Data.outstandingLoads) fileStates[fileName] = true;
+  for(let fileName of Object.keys(state.Data.errors)) fileStates[fileName] = state.Data.errors[fileName];
+
   return {
     busy: state.Data.outstandingLoads.length > 0,
-    fileNames: state.Data.outstandingLoads,
+    fileStates: fileStates,
   }
 }
 

@@ -1,17 +1,17 @@
 'use strict';
 
-const canUseFileAPI = File !== undefined
+import * as FileAPI from './fileAPI';
 
-function openWithFileAPI(fileInput) {
-  const streamInfo = { type: 'fileAPI' }
+function unknownFileType() {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => { reject("Unknown file type"); }, 0);
+  });
 }
 
-export function openFile(fileinput) {
-  return new Promise((resolve, reject) => {
-    if (canUseFileApi) {
-      return openWithFileAPI(fileInput);
-    }      
-  });
+export function openFile(fileInput) {
+  if (FileAPI.canUse(fileInput)) return FileAPI.open(fileInput);
+
+  return unknownFileType(); 
 }
 
 export function seek(stream) {

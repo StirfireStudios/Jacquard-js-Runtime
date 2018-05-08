@@ -1,40 +1,64 @@
 import { createReducer } from 'redux-act';
-import JacquardRuntime from '../jacquard-js-runtime'
 
 import * as DataActions from '../actions/data';
 
+function dupeArray(array) {
+  return array.map((item) => (item));
+}
+
+function filterArray(array, removeItem) {
+  return array.filter((item) => (item !== removeItem));
+}
+
 export default createReducer({
   [DataActions.LoadStarted]: (state, filename) => {
-    const newOutstanding = state.outstandingLoads.map((item) => (item));
+    const newOutstanding = dupeArray(state.outstandingLoads);
     newOutstanding.push(filename);
-  return {
-    ...state,
-    outstandingLoads: newOutstanding,
-  }},
-  [DataActions.LogicLoaded]: (state, stream) => ({
-    ...state,
-    outstandingLoads: state.outstandingLoads - 1,
-    logicStream: stream,
-  }),
-  [DataActions.DialogueLoaded]: (state, stream) => ({
-    ...state,
-    outstandingLoads: state.outstandingLoads - 1,
-    dialogStream: stream,
-  }),
-  [DataActions.SourceMapLoaded]: (state, stream) => ({
-    ...state,
-    outstandingLoads: state.outstandingLoads - 1,
-    sourceMapStream: stream,
-  }),
-  [DataActions.SourceMapLoaded]: (state, stream) => ({
-    ...state,
-    outstandingLoads: state.outstandingLoads - 1,
-    sourceMapStream: stream,
-  }),
+    const newErrors = Object.assign({}, state.errors);
+    delete(newErrors[filename]);
+    return {
+      ...state,
+      outstandingLoads: newOutstanding,
+    }
+  },
+  [DataActions.LogicLoaded]: (state, data) => {
+    const newOutstanding = filterArray(state.outstandingLoads, data.fileName);
+    return {
+      ...state,
+      outstandingLoads: newOutstanding,
+      logicStream: data.stream,
+    }
+  },
+  [DataActions.DialogueLoaded]: (state, data) => {
+    const newOutstanding = filterArray(state.outstandingLoads, data.fileName);
+    return {
+      ...state,
+      outstandingLoads: newOutstanding,
+      logicStream: data.stream,
+    }
+  },
+  [DataActions.SourceMapLoaded]: (state, data) => {
+    const newOutstanding = filterArray(state.outstandingLoads, data.fileName);
+    return {
+      ...state,
+      outstandingLoads: newOutstanding,
+      logicStream: data.stream,
+    }
+  },
+  [DataActions.ErrorLoading]: (state, data) => {
+    const newOutstanding = filterArray(state.outstandingLoads, data.fileName);
+    const newErrors = Object.assign({}, state.errors);
+    newErrors[data.fileName] = data.error;
+    return {
+      ...state,
+      outstandingLoads: newOutstanding,
+      errors: newErrors,
+    }
+  },
 }, {
   outstandingLoads: [],
   logicStream: null,
   dialogStream: null,
   sourceMapStream: null,
-  error: null,
+  errors: {},
 });

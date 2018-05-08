@@ -15,4 +15,3 @@ export class Runtime {
 }
 
 export { default as fileType } from './fileType';
-export { default as stream } from './stream';
