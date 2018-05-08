@@ -1,6 +1,6 @@
 'use strict';
 
-export default class Runtime{
+export class Runtime {
   constructor() {
 
   }
@@ -13,3 +13,6 @@ export default class Runtime{
 
   get functions() { return ["one", "two", "three"] }
 }
+
+export { default as fileType } from './fileType';
+export { default as stream } from './stream';

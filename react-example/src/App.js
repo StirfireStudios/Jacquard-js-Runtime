@@ -1,21 +1,20 @@
-import JacquardRuntime from './jacquard-js-runtime'
-
 import React, { Component } from 'react';
+import { Provider } from 'react-redux';
+
+import CurrentMode from './components/CurrentMode';
+import DevTools from './components/DevTools';
 
 import './App.css';
 
-
-class App extends Component {
-  componentDidMount() {
-  }
-
+export default class App extends Component {
   render() {
     return (
-      <div className="App">
-        I am app!
-      </div>
+      <Provider store={this.props.store}>
+        <div>
+          <CurrentMode/>
+          <DevTools/>
+        </div>
+      </Provider>
     );
   }
 }
-
-export default App;
