@@ -1,5 +1,4 @@
 /src/
 /docs/
-/yarn_files/
-/preprocessed_yarn_files/
+/bytecode/
 /.vscode/
