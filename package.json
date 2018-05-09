@@ -16,5 +16,8 @@
     "prepare": "yarn build",
     "serveDoc": "documentation serve --watch src/** -f html",
     "buildDoc": "documentation build src/** -f html -o docs"
+  },
+  "dependencies": {
+    "utf-8": "^2.0.0"
   }
 }

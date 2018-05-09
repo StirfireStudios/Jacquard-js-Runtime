@@ -10,6 +10,10 @@ function filterArray(array, removeItem) {
   return array.filter((item) => (item !== removeItem));
 }
 
+function dataTypeInvalid(type) {
+  return !(type === "logic" || type === "dialogue" || type === "sourceMap")
+}
+
 export default createReducer({
   [DataActions.LoadStarted]: (state, filename) => {
     const newOutstanding = dupeArray(state.outstandingLoads);
@@ -21,29 +25,29 @@ export default createReducer({
       outstandingLoads: newOutstanding,
     }
   },
-  [DataActions.LogicLoaded]: (state, data) => {
+  [DataActions.LoadComplete]: (state, data) => {
     const newOutstanding = filterArray(state.outstandingLoads, data.fileName);
-    return {
+    if (dataTypeInvalid(data.type)) {
+      console.error(`Unknown data type ${data.type} loaded request`);
+      return;
+    }
+
+    const newState = {
       ...state,
       outstandingLoads: newOutstanding,
-      logicStream: data.stream,
     }
+    newState[data.type] = {fileName: data.fileName, handle: data.handle};
+    return newState;
   },
-  [DataActions.DialogueLoaded]: (state, data) => {
-    const newOutstanding = filterArray(state.outstandingLoads, data.fileName);
-    return {
-      ...state,
-      outstandingLoads: newOutstanding,
-      logicStream: data.stream,
+  [DataActions.UnloadFile]: (state, type) => {
+    if (dataTypeInvalid(type)) {
+      console.error(`Unknown data type ${type} unload request`);
+      return;
     }
-  },
-  [DataActions.SourceMapLoaded]: (state, data) => {
-    const newOutstanding = filterArray(state.outstandingLoads, data.fileName);
-    return {
-      ...state,
-      outstandingLoads: newOutstanding,
-      logicStream: data.stream,
-    }
+
+    const newState = { ...state }
+    newState[type] = null;
+    return newState;
   },
   [DataActions.ErrorLoading]: (state, data) => {
     const newOutstanding = filterArray(state.outstandingLoads, data.fileName);
@@ -57,8 +61,8 @@ export default createReducer({
   },
 }, {
   outstandingLoads: [],
-  logicStream: null,
-  dialogStream: null,
-  sourceMapStream: null,
+  logic: null,
+  dialog: null,
+  sourceMap: null,
   errors: {},
 });

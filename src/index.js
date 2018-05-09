@@ -13,5 +13,3 @@ export class Runtime {
 
   get functions() { return ["one", "two", "three"] }
 }
-
-export { default as fileType } from './fileType';

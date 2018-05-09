@@ -1,13 +1,25 @@
 import * as DataActions from '../actions/data';
 
-import * as Stream from '../jacquard-js-runtime/stream';
+import * as FileIO from '../jacquard-js-runtime/fileIO';
 
 export function LoadFile(file) {
   DataActions.LoadStarted(file.name);
-  Stream.openFile(file).then((stream) => {
-    console.log("Stream Open!");
-    console.log(stream);
-    // now see what file type it is.
+  FileIO.Open(file).then((data) => {
+    switch(FileIO.Type(data)) {
+      case FileIO.Types.Logic:
+        DataActions.LoadComplete('logic', file.name, data);
+        break;
+      case FileIO.Types.Dialogue:
+        DataActions.LoadComplete('dialogue', file.name, data);
+        break;
+      case FileIO.Types.SourceMap:
+        DataActions.LoadComplete('sourceMap', file.name, data);
+        break;
+      case FileIO.Types.Unknown:
+      default:
+        DataActions.ErrorLoading(file.name, `Unknown file type`);
+        break;
+    }
   }).catch((error) => {
     console.log(error);
     if (error != null) {
