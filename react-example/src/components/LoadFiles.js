@@ -3,15 +3,16 @@ import { bindActionCreators } from 'redux'
 import React, { Component } from 'react';
 import ReactFileReader  from 'react-file-reader';
 
-import * as DataActions from '../actions/data'
+import * as DataActions from '../actions/data';
 import * as DataAsync from '../actionsAsync/data';
+import * as RuntimeActions from '../actions/runtime'
 
 function onFileSelect(files) {
   for(let file of files) DataAsync.LoadFile(file);
 }
 
 function onRun() {
-  console.log("run!");
+  this.props.runtimeActions.Activate();
 }
 
 function renderFileState() {
@@ -52,17 +53,20 @@ function renderUploadButton() {
 function renderReadyButton() {
   if (!this.props.ready) return <div>Not Ready</div>;
   const filenames = [];
-  filenames.push(<div key="logic">
-    <label>Logic File:</label><span>{this.props.logicFile}</span>
+  filenames.push(
+    <div key="logic">
+      <label>Logic File:</label><span>{this.props.logicFile}</span>
     </div>
   );
-  filenames.push(<div key="dialogue">
-    <label>Dialogue File:</label><span>{this.props.dialogueFile}</span>
+  filenames.push(
+    <div key="dialogue">
+      <label>Dialogue File:</label><span>{this.props.dialogueFile}</span>
     </div>
   );
   if (this.props.sourceMapFile != null) {
-    filenames.push(<div key="sourceMap">
-      <label>SourceMap File:</label><span>{this.props.sourceMapFile}</span>
+    filenames.push(
+      <div key="sourceMap">
+        <label>SourceMap File:</label><span>{this.props.sourceMapFile}</span>
       </div>
     );  
   }
@@ -89,7 +93,6 @@ class LoadFiles extends Component {
 
 function mapStateToProps(state) {
   const busy = state.Data.outstandingLoads.length > 0;
-  const ready = state.Data.logic != null && state.Data.dialogue != null && !busy;
   const fileStates = {};
 
   for(let fileName of state.Data.outstandingLoads) fileStates[fileName] = true;
@@ -98,16 +101,17 @@ function mapStateToProps(state) {
   return {
     busy: busy,
     fileStates: fileStates,
-    ready: ready,
-    logicFile: state.Data.logic != null ? state.Data.logic.fileName : null,
-    dialogueFile: state.Data.dialogue != null ? state.Data.dialogue.fileName : null,
-    sourceMapFile: state.Data.sourceMap != null ? state.Data.sourceMap.fileName : null,
+    ready: state.Runtime.ready,
+    logicFile: state.Data.logic,
+    dialogueFile: state.Data.dialogue,
+    sourceMapFile: state.Data.sourceMap,
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators(DataActions, dispatch)
+    dataActions: bindActionCreators(DataActions, dispatch),
+    runtimeActions: bindActionCreators(RuntimeActions, dispatch),
   }
 }
 

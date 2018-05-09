@@ -36,7 +36,7 @@ export default createReducer({
       ...state,
       outstandingLoads: newOutstanding,
     }
-    newState[data.type] = {fileName: data.fileName, handle: data.handle};
+    newState[data.type] = data.fileName;
     return newState;
   },
   [DataActions.UnloadFile]: (state, type) => {
