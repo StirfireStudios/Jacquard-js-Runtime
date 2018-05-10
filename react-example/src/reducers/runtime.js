@@ -21,8 +21,10 @@ function updateWithRuntimeData(state) {
       ready: false,
       characters: [],
       variables: [],
+      variableState: {},
       functions: [],
       nodeNames: [],
+      nodeHistory: [],
     }
   }
 
@@ -31,9 +33,11 @@ function updateWithRuntimeData(state) {
     ready: true,
     characters: runtime.characters,
     variables: runtime.variableList,
+    variableState: {},
     functions: runtime.functionList,
     dialogueLoaded: runtime.dialogueLoaded,
     nodeNames: runtime.nodeNames,
+    nodeHistory: [],
   }
 }
 
