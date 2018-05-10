@@ -42,9 +42,33 @@ export function Type(handle) {
   }
 }
 
+export function ReadByte(handle, offset) {
+  for(let subType of subTypes) {
+    if (subType.isType(handle)) return subType.readByte(handle, offset);
+  }
+  
+  return -1;  
+}
+
+export function ReadFloat(handle, offset) {
+  for(let subType of subTypes) {
+    if (subType.isType(handle)) return subType.readFloat(handle, offset);
+  }
+  
+  return -1;  
+}
+
 export function ReadVarInt(handle, offset) {
   for(let subType of subTypes) {
     if (subType.isType(handle)) return subType.readVarInt(handle, offset);
+  }
+  
+  return {length: -1, data: null};
+}
+
+export function ReadVarBytes(handle, offset) {
+  for(let subType of subTypes) {
+    if (subType.isType(handle)) return subType.readVarBytes(handle, offset);
   }
   
   return {length: -1, data: null};

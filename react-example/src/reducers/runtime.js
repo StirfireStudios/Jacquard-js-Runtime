@@ -52,15 +52,25 @@ export default createReducer({
 	}),
   [DataActions.LoadComplete]: (state, data) => {
     runtime.loadFile(data.handle);
-    return updateWithRuntimeData(...state);
+    return updateWithRuntimeData(state);
   },
   [DataActions.UnloadFile]: (state, type) => {
     runtime.removeFile(convertType(type));
-    return updateWithRuntimeData(...state);
+    return updateWithRuntimeData(state);
+  },
+  [RuntimeActions.Run]: (state) => {
+    runtime.run();
+    return updateWithRuntimeData(state);
+  },
+  [RuntimeActions.RunStep]: (state) => {
+//    runtime.Step();
+    return updateWithRuntimeData(state);
   },
 }, {
   ready: false,
   active: false,
+  runMode: "toOption",
+  waitingFor: "start",
   characters: [],
   variables: [],
   functions: [],

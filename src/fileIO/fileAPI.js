@@ -70,6 +70,15 @@ export function fileType(stream) {
   return stream.type;
 }
 
+export function readByte(stream, offset) {
+  return stream.buffer[offset];
+}
+
+export function readFloat(stream, offset) {
+  const view = new Float32Array(stream.buffer.buffer, offset, 4);
+  return {data:view[0], length: 4};
+}
+
 export function readVarInt(stream, offset) {
   let intLength = stream.buffer[offset];
   if (intLength === 0 || intLength === 128) {

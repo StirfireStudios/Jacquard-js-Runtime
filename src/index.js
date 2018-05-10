@@ -3,6 +3,7 @@
 import Dialogue from './binaryReaders/dialogue';
 import * as FileIO from './fileIO';
 import Logic from './binaryReaders/logic';
+import * as VM from './vm';
 
 const privates = new WeakMap();
 
@@ -21,6 +22,14 @@ function checkReady() {
     priv.ready = false;
     return;
   } else {
+    priv.execState = {
+      variables: {},
+      args: [],
+      options: [],
+      visited: [],
+      logicOffset: 0,
+      dialogueOffset: -1,
+    }
     priv.ready = true;
   }
 }
@@ -84,6 +93,29 @@ export class Runtime {
     }
 
     checkReady.call(this);
+  }
+
+  /**
+   * Run the bytecode
+   * @param {*} singleInstruction - run only one instruction at a time
+   */
+  run(singleInstruction) {
+    const priv = privates.get(this);
+    let stop = singleInstruction == true;
+    let index = -1;
+    while(!stop) {
+      index += 1;
+      const command = VM.execute(priv.execState, priv.logic, priv.dialogue);
+      if (command == null) {
+        stop = stop
+      } else if (command.enterNode != null) {
+        priv.execState.visited.push(priv.logic.nodeNames[command.enterNode]);
+      } else if (command.external != null) {
+        console.log(`External Command: ${command.external}`)
+        console.log(command.external.value);
+        stop = true;
+      }  
+    }
   }
 
   /**
@@ -165,4 +197,4 @@ export class Runtime {
 
 const ExportedFileIO = {Open: FileIO.Open, Types: FileIO.Types, Type: FileIO.Type}
 
-export { ExportedFileIO as FileIO}
+export { ExportedFileIO as FileIO }

@@ -14,7 +14,7 @@ export default class ListView extends Component {
     for(let index = 0; index < this.props.list.length; index++) {
       list.push(
         <div key={index}>{this.props.list[index]}</div>
-      )
+      );
     }
 
     return (

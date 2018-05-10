@@ -23,7 +23,10 @@ export function ParseHeaderTables(TableOrder, offset) {
         break;
       case "byteOffsetArray":
         retVal[table.name] = Object.freeze(FileIO.ReadByteOffsetTable(priv.handle,  tableOffset.data).data);
-        break;      
+        break;
+      case "instructionOffset":
+        priv.instructionStart = tableOffset.data;
+        break;
       default:
         retVal[table.name] = tableOffset.data;
     }
@@ -54,4 +57,8 @@ export class BaseReader {
   }
 
   get version() { return privates.get(this).version; }
+
+  get handle() { return privates.get(this).handle; }
+
+  get instructionStart() { return privates.get(this).instructionStart; }
 }

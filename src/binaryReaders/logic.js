@@ -9,7 +9,7 @@ const TableOrder = [
   {name: "variables", type: "stringArray"},
   {name: "strings", type: "stringArray"},
   {name: "nodes", type: "stringOffsetArray"},
-  {name: "instructions", type: "offsetOnly"},
+  {name: "instructions", type: "instructionOffset"},
 ]
 
 const privates = new WeakMap();
@@ -26,4 +26,5 @@ export default class Logic extends Base.BaseReader {
   get variables() { return privates.get(this).variables; }
   get strings() { return privates.get(this).strings; }
   get nodeNames() { return Object.keys(privates.get(this).nodes); }
+
 }

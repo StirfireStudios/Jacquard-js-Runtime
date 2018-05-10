@@ -4,10 +4,11 @@ import React, { Component } from 'react';
 
 import ListView from './ListView';
 
-import * as Actions from '../actions/view';
+import * as RuntimeActions from '../actions/runtime';
+import * as ViewActions from '../actions/view';
 
 function onClick(key, show, event) {
-  this.props.actions.ChangeVisibility(key, show);
+  this.props.actions.view.ChangeVisibility(key, show);
   event.preventDefault();
 }
 
@@ -57,23 +58,12 @@ function renderLists() {
     );
   }
 
-  return <div class="lists" key="lists">{output}</div>;
+  return <div className="lists" key="lists">{output}</div>;
 }
 
 function renderTextWindow() {
   return (
-    <div key="display" class="display">
-      
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tristique a sapien vitae congue. Sed id velit et sapien vestibulum imperdiet et vitae metus. Mauris euismod rhoncus tempor. Donec rhoncus dui vitae justo laoreet porttitor. Aenean leo augue, consequat nec velit eget, dignissim lobortis massa. Curabitur in dictum orci. Etiam lobortis sapien consequat neque vulputate, sodales lobortis enim laoreet. Praesent venenatis elit facilisis augue commodo facilisis at nec turpis. Vestibulum vitae ante nec nibh iaculis placerat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse imperdiet lacus ut leo pellentesque volutpat.
-
-Sed in lacus ac diam lacinia elementum vitae porttitor orci. Sed vel luctus leo. Curabitur sed finibus urna. Maecenas nec urna nisl. Suspendisse ligula magna, suscipit vitae maximus at, efficitur vitae urna. Sed ut dui feugiat, elementum dui eget, viverra dui. Vivamus semper faucibus tellus, ut placerat lectus semper in. Cras nec libero laoreet, rhoncus dui sed, finibus mauris. Sed pellentesque luctus sem, vel suscipit purus consequat facilisis. Vivamus blandit nibh nec lorem dapibus auctor. Morbi nec quam sem. Mauris pulvinar magna dignissim odio accumsan fringilla.
-
-Cras in ex id elit imperdiet hendrerit sed et nibh. Nam dictum est at sem pellentesque rhoncus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tristique libero massa, eu ullamcorper massa mollis accumsan. Praesent pellentesque fringilla augue ac lacinia. Aliquam urna lectus, dignissim in lacinia a, lobortis et tortor. Cras faucibus elit nulla, sed sodales metus condimentum at. Aenean porta sagittis auctor. Curabitur placerat eu nibh non semper. In fermentum elit ac ipsum gravida, ut eleifend ligula lobortis. Praesent malesuada euismod lectus, et eleifend velit accumsan id. Nullam egestas ut quam ut mollis. Aenean porta nisi diam, eu vulputate leo blandit sit amet. Pellentesque imperdiet est scelerisque elit rutrum, vel fermentum libero tincidunt. Sed tortor eros, sollicitudin id eros eget, mollis facilisis neque.
-
-Ut nec dolor semper, pharetra dui at, consequat lectus. Sed vel vehicula lectus. Nunc a felis risus. Cras porta blandit enim, id interdum quam luctus id. Phasellus nisl velit, pulvinar pharetra sagittis et, dignissim at est. Sed vulputate facilisis tristique. Suspendisse hendrerit sem in leo dictum, in malesuada tortor scelerisque. Sed viverra vestibulum elit vel rutrum. Etiam molestie nisi quis massa gravida, sed dignissim metus tincidunt.
-
-Aenean scelerisque turpis purus, ut dictum elit vestibulum ac. Nulla ante quam, molestie ut aliquet sit amet, semper id nisi. Curabitur quis lobortis tellus. Proin sed erat sollicitudin, vulputate augue in, hendrerit leo. Suspendisse efficitur dui et blandit cursus. Curabitur a suscipit leo. Fusce sed risus id ex vehicula mollis. Nunc auctor erat sed magna vestibulum auctor. Mauris leo orci, semper quis facilisis ac, congue eu tortor. Fusce feugiat arcu quis congue sodales. Vestibulum scelerisque diam id quam egestas, id ullamcorper tellus lacinia. 
+    <div key="display" className="display">
     </div>
   );
 }
@@ -85,14 +75,41 @@ function renderButton(key) {
   return <button key={key} onClick={func} className={key.toLowerCase()}>{text} {key}</button>;
 }
 
+function runtimeAction(event) {
+  this();
+  event.preventDefault();
+}
+
+function renderPlaybackButtons() {
+  const playbackButtons = [];
+  if (!this.started) {
+    let func = runtimeAction.bind(this.props.actions.runtime.Run);
+    playbackButtons.push(
+      <button key="startNormal" onClick={func}>
+        Start (Normal)
+      </button>
+    );
+    func = runtimeAction.bind(this.props.actions.runtime.RunStep);    
+    playbackButtons.push(
+      <button key="startStep" onClick={func}>
+        Start (Single Step)
+      </button>
+    );
+  }
+
+  return playbackButtons;
+}
+
 function renderButtons() {
   const output = [];
+
+  output.push(renderPlaybackButtons.call(this));
 
   ["Characters", "State", "Variables", "NodeNames", "NodeHistory"].forEach((name) => {
     output.push(renderButton.call(this, name));
   })
 
-  return <div class="buttons" key="buttons">{output}</div>;
+  return <div className="buttons" key="buttons">{output}</div>;
 }
 
 class Viewer extends Component {
@@ -112,6 +129,8 @@ class Viewer extends Component {
 function mapStateToProps(state) {
   return {
     ready: state.Runtime.ready,
+    started: state.Runtime.waitingFor !== "start",
+    optionWait: state.Runtime.waitingFor !== "optionSelect",
     characters: state.Runtime.characters,
     showCharacters: state.View.showCharacters,
     state: state.Runtime.variableState,
@@ -127,7 +146,10 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators(Actions, dispatch),
+    actions: {
+      view: bindActionCreators(ViewActions, dispatch),
+      runtime: bindActionCreators(RuntimeActions, dispatch),
+    },
   }
 }
 
