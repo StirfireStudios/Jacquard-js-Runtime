@@ -1,15 +1,38 @@
 'use strict';
 
+import Dialogue from './binaryReaders/dialogue';
 import * as FileIO from './fileIO';
+import Logic from './binaryReaders/logic';
 
 const privates = new WeakMap();
+
+function checkReady() {
+  const priv = privates.get(this);
+  priv.errors = [];
+  if (priv.dialogue == null || priv.logic == null) {
+    priv.ready = false;
+    return;
+  }
+  
+  if (priv.dialogue.version !== priv.logic.version) {
+    const error = `Incompatible file versions - logic ${priv.logic.version}, dialogue: ${priv.dialogue.version}`;
+    priv.errors.push(error);
+    console.error(error);
+    priv.ready = false;
+    return;
+  } else {
+    priv.ready = true;
+  }
+}
 
 export default class Runtime {
   constructor() {
     const priv = {
-      logicHandle: null,
-      dialogueHandle: null,
+      logic: null,
+      dialogue: null,
       sourceMap: null,
+      errors: [],
+      ready: false,
     }
 
     privates.set(this, priv);
@@ -19,17 +42,19 @@ export default class Runtime {
     const priv = privates.get(this);
     switch(FileIO.Type(handle)) {
       case FileIO.Types.Logic:
-        priv.logicHandle = handle;
+        priv.logic = new Logic(handle);
         break;
       case FileIO.Types.Dialogue:
-        priv.dialogueHandle = handle;
+        priv.dialogue = new Dialogue(handle);
         break;
       case FileIO.Types.SourceMap:
         priv.sourceMap = {logic: handle.logic, dialogue: handle.dialogue};
         break;
       default:
-        break;
+        return;
     }
+    
+    checkReady.call(this);
   }
 
   removeFile(type) {
@@ -45,14 +70,15 @@ export default class Runtime {
         priv.sourceMap = null;
         break;
       default:
-        break;
+        return;
     }
+
+    checkReady.call(this);
   }
 
-  get ready() {
-    const priv = privates.get(this);
-    return priv.logicHandle != null && priv.dialogueHandle != null;
-  }
+  get ready() { return privates.get(this).ready; }
+
+  get errors() { return privates.get(this).errors; }
 
   get logicLoaded() { return privates.get(this).logicHandle != null; }
 
