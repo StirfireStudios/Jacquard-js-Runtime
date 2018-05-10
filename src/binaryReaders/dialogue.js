@@ -25,5 +25,5 @@ export default class Logic extends Base.BaseReader {
 
   get characters() { return privates.get(this).characters; }
   get functions() { return privates.get(this).functions; }
-  get strings() { return privates.get(this).functions; }
+  get strings() { return privates.get(this).strings; }
 }

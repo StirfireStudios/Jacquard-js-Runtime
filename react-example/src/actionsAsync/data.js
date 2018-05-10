@@ -1,6 +1,6 @@
 import * as DataActions from '../actions/data';
 
-import * as FileIO from '../jacquard-js-runtime/fileIO';
+import { FileIO } from '../jacquard-js-runtime'
 
 export function LoadFile(file) {
   DataActions.LoadStarted(file.name);

@@ -71,10 +71,10 @@ export class Runtime {
     const priv = privates.get(this);
     switch(FileIO.Type(handle)) {
       case FileIO.Types.Logic:
-        priv.logicHandle = null;
+        priv.logic = null;
         break;
       case FileIO.Types.Dialogue:
-        priv.dialogueHandle = null;
+        priv.dialogue = null;
         break;
       case FileIO.Types.SourceMap:
         priv.sourceMap = null;
@@ -120,7 +120,7 @@ export class Runtime {
    * returns the variable list if the logic file is loaded
    * @returns {string[]} variable list
    */
-  get variables() {
+  get variableList() {
     const logic = privates.get(this).logic;
     if (logic == null) return [];
     return logic.variables;
@@ -130,7 +130,7 @@ export class Runtime {
    * returns the function list if the logic file is loaded
    * @returns {string[]} function list
    */
-  get functions() {
+  get functionList() {
     const logic = privates.get(this).logic;
     if (logic == null) return [];
     return logic.functions;
@@ -155,6 +155,14 @@ export class Runtime {
     if (dialogue == null) return [];
     return dialogue.characters;    
   }
+
+  get nodeNames() {
+    const logic = privates.get(this).logic;
+    if (logic == null) return [];
+    return logic.nodeNames;
+  }
 }
 
-export {Open, Types, Type} from './fileIO';
+const ExportedFileIO = {Open: FileIO.Open, Types: FileIO.Types, Type: FileIO.Type}
+
+export { ExportedFileIO as FileIO}

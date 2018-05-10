@@ -5,7 +5,7 @@ import ReactFileReader  from 'react-file-reader';
 
 import * as DataActions from '../actions/data';
 import * as DataAsync from '../actionsAsync/data';
-import * as RuntimeActions from '../actions/runtime'
+import * as RuntimeActions from '../actions/runtime';
 
 function onFileSelect(files) {
   for(let file of files) DataAsync.LoadFile(file);

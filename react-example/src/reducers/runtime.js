@@ -1,20 +1,41 @@
 import { createReducer } from 'redux-act';
-import JacquardRuntime from '../jacquard-js-runtime'
-import * as FileIO from '../jacquard-js-runtime/fileIO';
+import * as JacquardRuntime from '../jacquard-js-runtime'
 
 import * as DataActions from '../actions/data';
 import * as RuntimeActions from '../actions/runtime';
 
+const runtime = new JacquardRuntime.Runtime();
 
 function convertType(textType) {
-  if (textType === 'logic') return FileIO.Types.Logic;
-  if (textType === 'dialogue') return FileIO.Types.Dialogue;
-  if (textType === 'sourceMap') return FileIO.Types.SourceMap;
+  if (textType === 'logic') return JacquardRuntime.FileIO.Types.Logic;
+  if (textType === 'dialogue') return JacquardRuntime.FileIO.Types.Dialogue;
+  if (textType === 'sourceMap') return JacquardRuntime.FileIO.Types.SourceMap;
 
-  return FileIO.Types.Unknown;
+  return JacquardRuntime.FileIO.Types.Unknown;
 }
 
-const runtime = new JacquardRuntime();
+function updateWithRuntimeData(state) {
+  if (!runtime.ready) {
+    return {
+      ...state,
+      ready: false,
+      characters: [],
+      variables: [],
+      functions: [],
+      nodeNames: [],
+    }
+  }
+
+  return {
+    ...state,
+    ready: true,
+    characters: runtime.characters,
+    variables: runtime.variableList,
+    functions: runtime.functionList,
+    dialogueLoaded: runtime.dialogueLoaded,
+    nodeNames: runtime.nodeNames,
+  }
+}
 
 export default createReducer({
   [RuntimeActions.Activate]: (state) => ({
@@ -27,20 +48,17 @@ export default createReducer({
 	}),
   [DataActions.LoadComplete]: (state, data) => {
     runtime.loadFile(data.handle);
-
-    return {
-      ...state,
-      ready: runtime.ready,
-    }
+    return updateWithRuntimeData(...state);
   },
   [DataActions.UnloadFile]: (state, type) => {
     runtime.removeFile(convertType(type));
-    return {
-      ...state,
-      ready: runtime.ready,
-    }
+    return updateWithRuntimeData(...state);
   },
 }, {
   ready: false,
   active: false,
+  characters: [],
+  variables: [],
+  functions: [],
+  nodeNames: [],
 });

@@ -2,13 +2,14 @@ import { connect } from 'react-redux';
 import React, { Component } from 'react';
 
 import LoadFiles from './LoadFiles';
+import Viewer from './Viewer';
 
 function currentMode() {
   switch(this.props.mode) {
     case "loading": 
       return(<LoadFiles/>);
     case "running":
-      return(<span>Run Bytecode!</span>);
+      return(<Viewer/>);
     default:
       return(<span>Unknown mode!</span>);
   }
