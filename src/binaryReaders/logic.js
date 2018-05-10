@@ -21,4 +21,10 @@ export default class Logic extends Base.BaseReader {
     console.log(priv);
     privates.set(this, priv);
   }
+
+  get characters() { return privates.get(this).characters; }
+  get functions() { return privates.get(this).functions; }
+  get variables() { return privates.get(this).functions; }
+  get strings() { return privates.get(this).functions; }
+  get nodeNames() { return Object.keys(privates.get(this).nodes); }
 }

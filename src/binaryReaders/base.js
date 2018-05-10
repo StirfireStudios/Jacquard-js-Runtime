@@ -16,13 +16,13 @@ export function ParseHeaderTables(TableOrder, offset) {
     offset += tableOffset.length;
     switch(table.type) {
       case "stringArray":
-        retVal[table.name] = FileIO.ReadStringTable(priv.handle,  tableOffset.data).data;
+        retVal[table.name] = Object.freeze(FileIO.ReadStringTable(priv.handle,  tableOffset.data).data);
         break;
       case "stringOffsetArray":
-        retVal[table.name] = FileIO.ReadStringOffsetTable(priv.handle,  tableOffset.data).data;
+        retVal[table.name] = Ojbect.freeze(FileIO.ReadStringOffsetTable(priv.handle,  tableOffset.data).data);
         break;
       case "byteOffsetArray":
-        retVal[table.name] = FileIO.ReadByteOffsetTable(priv.handle,  tableOffset.data).data;
+        retVal[table.name] = Object.freeze(FileIO.ReadByteOffsetTable(priv.handle,  tableOffset.data).data);
         break;      
       default:
         retVal[table.name] = tableOffset.data;

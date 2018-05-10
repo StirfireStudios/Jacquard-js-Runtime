@@ -10,6 +10,17 @@ function unknownFileType() {
   });
 }
 
+/** FileIO operations
+ * @name FileIO
+ */
+
+/**
+ * Open some file data (currently the browser File API is supported) for later use
+ * @name FileIO.Open
+ * @memberof FileIO
+ * @param {*} fileInput the file data to use as input
+ * @returns {Promise} a promise that either returns the file stream {FileIO.handle} or an error
+ */
 export function Open(fileInput) {
   for(let subType of subTypes) {
     if (subType.canUse(fileInput)) return subType.open(fileInput);
@@ -18,47 +29,54 @@ export function Open(fileInput) {
   return unknownFileType(); 
 }
 
-export function Type(stream) {
+/** 
+ * Get type of a file stream
+ * @memberof FileIO
+ * @name FileIO.Type
+ * @param {FileIO.handle} handle 
+ * @returns {FileIO.Types} file type
+ */
+export function Type(handle) {
   for(let subType of subTypes) {
-    if (subType.isType(stream)) return subType.fileType(stream);
+    if (subType.isType(handle)) return subType.fileType(handle);
   }
 }
 
-export function ReadVarInt(stream, offset) {
+export function ReadVarInt(handle, offset) {
   for(let subType of subTypes) {
-    if (subType.isType(stream)) return subType.readVarInt(stream, offset);
-  }
-  
-  return {length: -1, data: null};
-}
-
-export function ReadVarString(stream, offset) {
-  for(let subType of subTypes) {
-    if (subType.isType(stream)) return subType.readVarString(stream, offset);
-  }
-  
-  return {length: -1, data: null};
-}
-
-export function ReadStringTable(stream, offset) {
-  for(let subType of subTypes) {
-    if (subType.isType(stream)) return subType.readStringTable(stream, offset);
+    if (subType.isType(handle)) return subType.readVarInt(handle, offset);
   }
   
   return {length: -1, data: null};
 }
 
-export function ReadStringOffsetTable(stream, offset) {
+export function ReadVarString(handle, offset) {
   for(let subType of subTypes) {
-    if (subType.isType(stream)) return subType.readStringOffsetTable(stream, offset);
+    if (subType.isType(handle)) return subType.readVarString(handle, offset);
   }
   
   return {length: -1, data: null};
 }
 
-export function ReadByteOffsetTable(stream, offset) {
+export function ReadStringTable(handle, offset) {
   for(let subType of subTypes) {
-    if (subType.isType(stream)) return subType.readByteOffsetTable(stream, offset);
+    if (subType.isType(handle)) return subType.readStringTable(handle, offset);
+  }
+  
+  return {length: -1, data: null};
+}
+
+export function ReadStringOffsetTable(handle, offset) {
+  for(let subType of subTypes) {
+    if (subType.isType(handle)) return subType.readStringOffsetTable(handle, offset);
+  }
+  
+  return {length: -1, data: null};
+}
+
+export function ReadByteOffsetTable(handle, offset) {
+  for(let subType of subTypes) {
+    if (subType.isType(handle)) return subType.readByteOffsetTable(handle, offset);
   }
   
   return {length: -1, data: null};

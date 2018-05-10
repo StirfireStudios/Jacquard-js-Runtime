@@ -21,6 +21,9 @@ export default class Logic extends Base.BaseReader {
     const priv = Base.ParseHeaderTables.call(this, TableOrder);
     priv.language = languageInfo.data;
     privates.set(this, priv);
-    console.log(priv);
   }
+
+  get characters() { return privates.get(this).characters; }
+  get functions() { return privates.get(this).functions; }
+  get strings() { return privates.get(this).functions; }
 }
