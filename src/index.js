@@ -112,7 +112,7 @@ export class Runtime {
         priv.execState.visited.push(priv.logic.nodeNames[command.enterNode]);
       } else if (command.external != null) {
         console.log(`External Command: ${command.external}`)
-        console.log(command.external.value);
+        console.log(command);
         stop = true;
       }  
     }

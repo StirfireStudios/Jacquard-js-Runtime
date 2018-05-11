@@ -1,5 +1,4 @@
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux'
 import React, { Component } from 'react';
 
 import ListView from './ListView';
@@ -8,7 +7,7 @@ import * as RuntimeActions from '../actions/runtime';
 import * as ViewActions from '../actions/view';
 
 function onClick(key, show, event) {
-  this.props.actions.view.ChangeVisibility(key, show);
+  ViewActions.ChangeVisibility(key, show);
   event.preventDefault();
 }
 
@@ -18,7 +17,7 @@ function renderLists() {
     output.push(
       <ListView 
         list={this.props.characters} 
-        name="characters" 
+        name="characters"
         hideFunc={onClick.bind(this, "Characters", false)}
       />
     );
@@ -83,13 +82,13 @@ function runtimeAction(event) {
 function renderPlaybackButtons() {
   const playbackButtons = [];
   if (!this.started) {
-    let func = runtimeAction.bind(this.props.actions.runtime.Run);
+    let func = runtimeAction.bind(RuntimeActions.Run);
     playbackButtons.push(
       <button key="startNormal" onClick={func}>
         Start (Normal)
       </button>
     );
-    func = runtimeAction.bind(this.props.actions.runtime.RunStep);    
+    func = runtimeAction.bind(RuntimeActions.RunStep);    
     playbackButtons.push(
       <button key="startStep" onClick={func}>
         Start (Single Step)
@@ -144,13 +143,4 @@ function mapStateToProps(state) {
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    actions: {
-      view: bindActionCreators(ViewActions, dispatch),
-      runtime: bindActionCreators(RuntimeActions, dispatch),
-    },
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Viewer);
+export default connect(mapStateToProps)(Viewer);

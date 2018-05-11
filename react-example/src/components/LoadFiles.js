@@ -1,5 +1,4 @@
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux'
 import React, { Component } from 'react';
 import ReactFileReader  from 'react-file-reader';
 
@@ -12,7 +11,7 @@ function onFileSelect(files) {
 }
 
 function onRun() {
-  this.props.runtimeActions.Activate();
+  RuntimeActions.Activate();
 }
 
 function renderFileState() {
@@ -108,11 +107,4 @@ function mapStateToProps(state) {
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    dataActions: bindActionCreators(DataActions, dispatch),
-    runtimeActions: bindActionCreators(RuntimeActions, dispatch),
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(LoadFiles);
+export default connect(mapStateToProps)(LoadFiles);

@@ -2,6 +2,14 @@
 
 import * as FileIO from '../fileIO';
 
+import * as Command from './command';
+import * as DialogueBlock from './dialogueBlock';
+import * as Jump from './jump';
+import * as Node from './node';
+import * as Static from './static';
+import * as Text from './text';
+import * as Variable from './variable';
+
 export function execute(state, logic, dialogue) {
   let start = logic.instructionStart;
   let offset = state.logicOffset + logic.instructionStart;
@@ -22,58 +30,35 @@ export function execute(state, logic, dialogue) {
   switch(opCode) {
     case 0: // Noop
       break;
-    case 1: // ShowText
-      retValue = { 
-        external: "showText",
-        value: state.args.join(""),
-        characterIndex: state.characterIndex,
-      }
+    case 1:
+      retValue = Text.Show(state);
       break;
-    case 65: // Run Command
-      retValue = { external: "runCommand", value: state.args }
+    case 65:
+      retValue = Command.Run(state);
       break;
-    case 129: { // Show Dialogue Block
-        const blockIDInfo = FileIO.ReadVarBytes(handle, offset);
-        offset += blockIDInfo.length;
-        const characterIndexInfo = FileIO.ReadVarInt(handle, offset);
-        offset += characterIndexInfo.length;
-        state.characterIndex = characterIndexInfo.data;
-        state.dialogueOffset = dialogue.offsetForSegment(blockIDInfo.data);
-      }
+    case 129:
+      retValue = DialogueBlock.Show(state, handle, offset, dialogue);
       break;
     case 193: // Dialog Block End
       offset = -1;
       break;
-    case 2: {// Node entry
-        const nodeIndexInfo = FileIO.ReadVarInt(handle, offset);
-        offset += nodeIndexInfo.length;
-        retValue = { enterNode: nodeIndexInfo.data };
-      }
+    case 2:
+      retValue = Node.Entry(state, handle, offset);
       break;
-    case 3: // jump
-    case 67: // jumpIfTrue
-    case 131: {// jumpIfFalse
-        const newOffset = FileIO.ReadVarInt(handle, offset);
-        if (opcode = 3) { offset = newOffset + start; break; }
-        if (opCode === 67 && state.args.pop()) { offset = newOffset + start; break; }
-        if (opCode === 131 && !state.args.pop()) { offset = newOffset + start; break; }
-        offset += newOffset.length;
-      }
+    case 3:
+      retValue = Jump.Unconditional(state, handle, offset);
       break;
-    case 10: // VariableLoad
-    case 144: {// VariableSet
-        const varIndex = FileIO.ReadVarInt(handle, offset);
-        const varName = logic.variables[varIndex.data];
-        if (opcode == 10) { state.args.push(state.variables[varName]); }
-        if (opcode == 90) { state.variables[varName] = state.args[state.args.length - 1]; }
-      }
+    case 67:
+      retValue = Jump.IfTrue(state, handle, offset);
       break;
-    case 11: {// VariableSet
-        const varIndex = FileIO.ReadVarInt(handle, offset);
-        const varName = logic.variables[varIndex.data];
-        if (opcode == 10) { state.args.push(state.variables[varName]); }
-        if (opcode == 90) { state.variables[varName] = state.args[state.args.length - 1]; }
-      }
+    case 131:
+      retValue = Jump.IfFalse(state, handle, offset);
+      break;
+    case 16: 
+      retValue = Variable.Load(state, handle, offset, logic);
+      break;
+    case 144:
+      retValue = Variable.Set(state, handle, offset, logic);
       break;
     case 17: // Static Null
       state.args.push(null);
@@ -84,33 +69,34 @@ export function execute(state, logic, dialogue) {
     case 145: // Static false
       state.args.push(false);
       break;
-    case 209: {// Static String
-        const stringIndex = FileIO.ReadVarInt(handle, offset);
-        offset += stringIndex.length;
-        state.args.push(stringTable[stringIndex.data]);
-      }
+    case 209: 
+      debugger;
+      retValue = Static.String(state, handle, offset, stringTable);
       break;
-    case 18: {// Static Float
-        const floatInfo = FileIO.ReadFloat(handle, offset);
-        offset += floatInfo.length;
-        state.args.push(floatInfo.data);
-      }
+    case 18:
+      retValue = Static.Float(state, handle, offset);
       break;
-    case 82: {// Static Int
-        const intInfo = FileIO.ReadVarInt(handle, offset);
-        offset += intInfo.length;
-        state.args.push(intInfo.data);
-      }
+    case 82:
+      retValue = Static.Int(state, handle, offset);
       break;
     default:
       retValue = { external: "Unknown Opcode" };
   }
 
+  if (retValue != null && retValue.length) offset += retValue.length;
+  if (retValue != null && retValue.offset) offset = offset + start;
+
   if (inDialogue) {
-    state.dialogueOffset = offset - start;
+    if (offset == -1) {
+      state.dialogueOffset = -1;
+    } else {
+      state.dialogueOffset = offset - start;
+    }
   } else {
     state.logicOffset = offset - start;
   }
 
-  return retValue;
+  if (retValue != null && (retValue.data != null || retValue.external != null)) 
+    return retValue.data;
+  return null;
 }
