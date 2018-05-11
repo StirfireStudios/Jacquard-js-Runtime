@@ -2,10 +2,14 @@
 
 import * as FileIO from '../fileIO';
 
+import * as Clear from './clear';
 import * as Command from './command';
 import * as DialogueBlock from './dialogueBlock';
+import * as Function from './function';
 import * as Jump from './jump';
 import * as Node from './node';
+import * as Operator from './operator';
+import * as Option from './option';
 import * as Static from './static';
 import * as Text from './text';
 import * as Variable from './variable';
@@ -23,11 +27,10 @@ export function execute(state, logic, dialogue) {
     handle = dialogue.handle;
   }
 
-  const opCode = FileIO.ReadByte(handle, offset);
-  offset += 1;
+  const opCodeInfo = FileIO.ReadByte(handle, offset);
+  offset += opCodeInfo.length;
   let retValue = null;
-  debugger;
-  switch(opCode) {
+  switch(opCodeInfo.data) {
     case 0: // Noop
       break;
     case 1:
@@ -70,7 +73,6 @@ export function execute(state, logic, dialogue) {
       state.args.push(false);
       break;
     case 209: 
-      debugger;
       retValue = Static.String(state, handle, offset, stringTable);
       break;
     case 18:
@@ -79,8 +81,62 @@ export function execute(state, logic, dialogue) {
     case 82:
       retValue = Static.Int(state, handle, offset);
       break;
+    case 19:
+      retValue = Operator.Add(state, handle, offset);
+      break;
+    case 83:
+      retValue = Operator.Subtract(state, handle, offset);
+      break;
+    case 20:
+      retValue = Operator.Multiply(state, handle, offset);
+      break;
+    case 84:
+      retValue = Operator.Divide(state, handle, offset);
+      break;
+    case 148:
+      retValue = Operator.Modulus(state, handle, offset);
+      break;
+    case 21:
+      retValue = Operator.Equal(state, handle, offset);
+      break;
+    case 85:
+      retValue = Operator.Not(state, handle, offset);
+      break;
+    case 22:
+      retValue = Operator.And(state, handle, offset);
+      break;
+    case 86:
+      retValue = Operator.Or(state, handle, offset);
+      break;
+    case 150:
+      retValue = Operator.Xor(state, handle, offset);
+      break;
+    case 23:
+      retValue = Operator.GreaterThan(state, handle, offset);
+      break;
+    case 87:
+      retValue = Operator.LessThan(state, handle, offset);
+      break;
+    case 24:
+      retValue = Function.Return(state, handle, offset, logic);
+      break;
+    case 88:
+      retValue = Function.NoReturn(state, handle, offset, logic);
+      break;
+    case 40:
+      retValue = Option.Push(state, handle, offset, start);
+      break;
+    case 41:
+      retValue = Option.Run(state);
+      break;      
+    case 253:
+      retValue = Clear.Arguments(state, handle, offset);
+      break;
+    case 254:
+      retValue = Clear.Options(state, handle, offset);
+      break;
     default:
-      retValue = { external: "Unknown Opcode" };
+      retValue = { data: { external: "Unknown Opcode" } };
   }
 
   if (retValue != null && retValue.length) offset += retValue.length;
@@ -96,7 +152,7 @@ export function execute(state, logic, dialogue) {
     state.logicOffset = offset - start;
   }
 
-  if (retValue != null && (retValue.data != null || retValue.external != null)) 
+  if (retValue != null && retValue.data != null) 
     return retValue.data;
   return null;
 }

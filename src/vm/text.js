@@ -6,8 +6,7 @@ export function Show(state) {
   return {
     length: 0,
     data: {
-      external: "showText",
-      value: state.args.join(""),
+      display: state.args.join(""),
       characterIndex: state.characterIndex,
     }
   };

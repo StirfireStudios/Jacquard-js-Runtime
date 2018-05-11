@@ -4,7 +4,7 @@ import * as FileIO from '../fileIO';
 
 export function String(state, handle, offset, table) {
   const stringIndex = FileIO.ReadVarInt(handle, offset);
-  state.args.push(stringTable[stringIndex.data]);
+  state.args.push(table[stringIndex.data]);
   return { length: stringIndex.length };
 }
 

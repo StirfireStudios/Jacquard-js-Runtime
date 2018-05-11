@@ -101,15 +101,31 @@ export class Runtime {
    */
   run(singleInstruction) {
     const priv = privates.get(this);
-    let stop = singleInstruction == true;
-    let index = -1;
+    priv.showText = null;
+    let stop = false;
     while(!stop) {
-      index += 1;
       const command = VM.execute(priv.execState, priv.logic, priv.dialogue);
+      stop = singleInstruction;
+      console.log(command);
       if (command == null) {
-        stop = stop
       } else if (command.enterNode != null) {
         priv.execState.visited.push(priv.logic.nodeNames[command.enterNode]);
+      } else if (command.function != null) {
+        console.log("Run function:");
+        console.log(command.function); 
+        stop = true;
+      } else if (command.options != null) {
+        console.log(`Run options:`);
+        console.log(command.options);
+        stop = true;
+      } else if (command.display != null) {
+        priv.showText = { text: command.display }
+        if (command.characterIndex !== -1) {
+          priv.showText.characterIndex = command.characterIndex;
+          priv.showText.character = priv.logic.characters[command.characterIndex];
+          priv.showText.localizedCharacter = priv.dialogue.characters[command.characterIndex];
+        }
+        stop = true;
       } else if (command.external != null) {
         console.log(`External Command: ${command.external}`)
         console.log(command);
@@ -117,6 +133,8 @@ export class Runtime {
       }  
     }
   }
+
+  get currentShowText() {  return privates.get(this).showText; }
 
   /**
    * Returns if the runtime is ready to start
@@ -192,6 +210,12 @@ export class Runtime {
     const logic = privates.get(this).logic;
     if (logic == null) return [];
     return logic.nodeNames;
+  }
+
+  get nodeHistory() {
+    const execState = privates.get(this).execState;
+    if (execState == null) return [];
+    return execState.visited.map((item) => {return item;});
   }
 }
 

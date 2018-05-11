@@ -71,7 +71,7 @@ export function fileType(stream) {
 }
 
 export function readByte(stream, offset) {
-  return stream.buffer[offset];
+  return {data: stream.buffer[offset], length: 1}
 }
 
 export function readFloat(stream, offset) {

@@ -61,8 +61,15 @@ function renderLists() {
 }
 
 function renderTextWindow() {
+  const text = [];
+  for(let index = 0; index < this.props.text.length; index++) {
+    const textLine = this.props.text[index];
+    text.push(<div key={index}>{textLine}</div>);
+  }
+
   return (
     <div key="display" className="display">
+      {text}
     </div>
   );
 }
@@ -140,6 +147,7 @@ function mapStateToProps(state) {
     showNodeNames: state.View.showNodeNames,
     nodeHistory: state.Runtime.nodeHistory,
     showNodeHistory: state.View.showNodeHistory,
+    text: state.Runtime.text,
   }
 }
 

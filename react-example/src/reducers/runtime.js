@@ -25,7 +25,18 @@ function updateWithRuntimeData(state) {
       functions: [],
       nodeNames: [],
       nodeHistory: [],
+      text: [],
     }
+  }
+
+  const text = state.text;
+  if (runtime.currentShowText != null) {
+    let textString = "";
+    if (runtime.currentShowText.localizedCharacter != null) {
+      textString += runtime.currentShowText.localizedCharacter + ": ";
+    }
+    textString += runtime.currentShowText.text;
+    text.push(textString);
   }
 
   return {
@@ -37,7 +48,8 @@ function updateWithRuntimeData(state) {
     functions: runtime.functionList,
     dialogueLoaded: runtime.dialogueLoaded,
     nodeNames: runtime.nodeNames,
-    nodeHistory: [],
+    nodeHistory: runtime.nodeHistory,
+    text: text,
   }
 }
 
@@ -63,7 +75,7 @@ export default createReducer({
     return updateWithRuntimeData(state);
   },
   [RuntimeActions.RunStep]: (state) => {
-//    runtime.Step();
+    runtime.run(true);
     return updateWithRuntimeData(state);
   },
 }, {
