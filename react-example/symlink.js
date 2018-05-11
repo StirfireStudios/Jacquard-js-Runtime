@@ -9,6 +9,6 @@ if (OS.type() === "Windows_NT") {
   const command = `mklink /D ${destination} ${source}`;
   ChildProcess.exec(command);
 } else {
-
-  console.log(`Command is: ln -s ${destination} ${source}`);
+  const command = `ln -s ${source} ${destination}`;
+  ChildProcess.exec(command);
 }
