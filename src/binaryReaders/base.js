@@ -51,6 +51,7 @@ export class BaseReader {
       handle: handle,
       version: versionInfo.data,
       offset: 5 + versionInfo.length,
+      length: 
     }
 
     privates.set(this, priv);
@@ -61,4 +62,6 @@ export class BaseReader {
   get handle() { return privates.get(this).handle; }
 
   get instructionStart() { return privates.get(this).instructionStart; }
+
+  get length() { return privates.get(this).length; }
 }

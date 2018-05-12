@@ -193,3 +193,7 @@ export function readByteOffsetTable(stream, offset) {
 
   return {length: length, data: data};
 }
+
+export function getLength(stream) {
+  return stream.length;
+}

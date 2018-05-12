@@ -106,4 +106,12 @@ export function ReadByteOffsetTable(handle, offset) {
   return {length: -1, data: null};
 }
 
+export function GetLength(handle) {
+  for(let subType of subTypes) {
+    if (subType.isType(handle)) return subType.getLength(handle);
+  }
+  
+  return -1;
+}
+
 export {default as Types} from './types'

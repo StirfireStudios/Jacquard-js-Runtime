@@ -59,6 +59,8 @@ function updateWithRuntimeData(state, runMode) {
           handleOptions(newState, runtime.currentMessage, runtime);
           keepRunning = false;
           break;
+        case "EndOfFile": 
+          keepRunning = false;
         default:
           break;
       }

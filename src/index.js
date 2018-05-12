@@ -136,7 +136,11 @@ export class Runtime {
       } else if (command.external != null) {
         priv.message = Messages.Command.handleCommand(command);
         stop = true;
-      }  
+      } else if (command.stop != null) {
+        priv.message = new Messages.EndOfFile(command.stop);
+        console.error(`Stop because: ${command.stop}`)
+        stop = true;
+      }
     }
   }
 

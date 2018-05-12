@@ -30,8 +30,12 @@ export function execute(state, ipState, logic, dialogue) {
     handle = dialogue.handle;
   }
 
+  if (offset >= FileIO.GetLength(handle)) {
+    return { stop: "end of file" }
+  }
+
   const opCodeInfo = FileIO.ReadByte(handle, offset);
-  //console.log(`Opcode: ${opCodeInfo.data.toString(16)} offset: ${offset}, dialogue: ${inDialogue}`);
+  console.log(`Opcode: ${opCodeInfo.data.toString(16)} offset: ${offset}, dialogue: ${inDialogue}`);
   offset += opCodeInfo.length;
   let retValue = null;
   switch(opCodeInfo.data) {
@@ -140,7 +144,7 @@ export function execute(state, ipState, logic, dialogue) {
       retValue = Clear.Options(ipState, handle, offset);
       break;
     default:
-      retValue = { data: { external: "Unknown Opcode" } };
+      retValue = { data: { stop: `Unknown Opcode ${opCodeInfo.data}` } };
   }
 
   if (retValue != null && retValue.length) offset += retValue.length;
