@@ -55,10 +55,10 @@ function updateWithRuntimeData(state, runMode) {
     if (runtime.currentMessage != null) {
       switch(runtime.currentMessage.constructor.name) {
         case "ShowText":
-          handleShowText(newState, runtime.currentMessage);
+          handleShowText(newState.text, runtime.currentMessage);
           break;
         case "Command":
-          handleCommand(newState, runtime.currentMessage);
+          handleCommand(newState.text, runtime.currentMessage);
           keepRunning = keepRunning && newState.runState !== "toCommand";
           break;
         case "Options":

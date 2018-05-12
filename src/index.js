@@ -141,8 +141,9 @@ export class Runtime {
     }
   }
 
-  moveInstructionPointerTo(newState) {
-
+  moveInstructionPointerTo(newIP) {
+    const priv = privates.get(this);
+    priv.IP = newIP;
   }
 
   get currentMessage() {  return privates.get(this).message; }

@@ -10,6 +10,7 @@ export function handleCommand(command) {
   for (let entryPoint of command.options) {
     const option = createIP();
     option.logicOffset = entryPoint;
+    options.push(option);
   }
   return message;
 }
