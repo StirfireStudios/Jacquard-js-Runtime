@@ -4,6 +4,8 @@ import * as JacquardRuntime from '../jacquard-js-runtime'
 import * as DataActions from '../actions/data';
 import * as RuntimeActions from '../actions/runtime';
 
+import handleShowText from './runtime/showText';
+
 const runtime = new JacquardRuntime.Runtime();
 
 function convertType(textType) {
@@ -12,17 +14,6 @@ function convertType(textType) {
   if (textType === 'sourceMap') return JacquardRuntime.FileIO.Types.SourceMap;
 
   return JacquardRuntime.FileIO.Types.Unknown;
-}
-
-function addNewText(textArray, message) {
-  for(let line of message.parts) {
-    let textString = "";
-    if (line.localizedCharacterName != null) {
-      textString += line.localizedCharacterName + ": ";
-    }
-    textString += line.text;
-    textArray.push(textString);  
-  }
 }
 
 function updateWithRuntimeData(state) {
@@ -40,15 +31,7 @@ function updateWithRuntimeData(state) {
     }
   }
 
-  if (runtime.currentMessage != null) {
-    switch(runtime.currentMessage.constructor.name) {
-      case "ShowText":
-        addNewText(state.text, runtime.currentMessage);
-        break;
-    }
-  }
-
-  return {
+  const newState = {
     ...state,
     ready: true,
     characters: runtime.characters,
@@ -59,6 +42,16 @@ function updateWithRuntimeData(state) {
     nodeNames: runtime.nodeNames,
     nodeHistory: runtime.nodeHistory,
   }
+
+  if (runtime.currentMessage != null) {
+    switch(runtime.currentMessage.constructor.name) {
+      case "ShowText":
+        handleShowText(newState, runtime.currentMessage);
+        break;
+    }
+  }
+
+  return newState;
 }
 
 export default createReducer({
