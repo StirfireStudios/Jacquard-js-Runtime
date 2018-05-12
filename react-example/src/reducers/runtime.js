@@ -14,6 +14,17 @@ function convertType(textType) {
   return JacquardRuntime.FileIO.Types.Unknown;
 }
 
+function addNewText(textArray, message) {
+  for(let line of message.parts) {
+    let textString = "";
+    if (line.localizedCharacterName != null) {
+      textString += line.localizedCharacterName + ": ";
+    }
+    textString += line.text;
+    textArray.push(textString);  
+  }
+}
+
 function updateWithRuntimeData(state) {
   if (!runtime.ready) {
     return {
@@ -29,14 +40,12 @@ function updateWithRuntimeData(state) {
     }
   }
 
-  const text = state.text;
-  if (runtime.currentShowText != null) {
-    let textString = "";
-    if (runtime.currentShowText.localizedCharacter != null) {
-      textString += runtime.currentShowText.localizedCharacter + ": ";
+  if (runtime.currentMessage != null) {
+    switch(runtime.currentMessage.constructor.name) {
+      case "ShowText":
+        addNewText(state.text, runtime.currentMessage);
+        break;
     }
-    textString += runtime.currentShowText.text;
-    text.push(textString);
   }
 
   return {
@@ -49,7 +58,6 @@ function updateWithRuntimeData(state) {
     dialogueLoaded: runtime.dialogueLoaded,
     nodeNames: runtime.nodeNames,
     nodeHistory: runtime.nodeHistory,
-    text: text,
   }
 }
 

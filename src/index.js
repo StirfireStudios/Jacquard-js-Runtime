@@ -5,6 +5,8 @@ import * as FileIO from './fileIO';
 import Logic from './binaryReaders/logic';
 import * as VM from './vm';
 
+import * as Messages from './messages';
+
 const privates = new WeakMap();
 
 function checkReady() {
@@ -32,6 +34,19 @@ function checkReady() {
     }
     priv.ready = true;
   }
+}
+
+function addShowText(command) {
+  const priv = privates.get(this);
+  const textLine = { text: command.display }
+  if (command.characterIndex !== -1) {
+    textLine.characterIndex = command.characterIndex;
+    textLine.character = priv.logic.characters[command.characterIndex];
+    textLine.localizedCharacter = priv.dialogue.characters[command.characterIndex];
+  }
+
+  if (priv.showText == null) priv.showText = [];
+  priv.showText.push(textLine);
 }
 
 /** This class represents a Jacquard bytecode runtime
@@ -101,12 +116,11 @@ export class Runtime {
    */
   run(singleInstruction) {
     const priv = privates.get(this);
-    priv.showText = null;
+    priv.message = null;
     let stop = false;
     while(!stop) {
       const command = VM.execute(priv.execState, priv.logic, priv.dialogue);
       stop = singleInstruction;
-      console.log(command);
       if (command == null) {
       } else if (command.enterNode != null) {
         priv.execState.visited.push(priv.logic.nodeNames[command.enterNode]);
@@ -119,13 +133,9 @@ export class Runtime {
         console.log(command.options);
         stop = true;
       } else if (command.display != null) {
-        priv.showText = { text: command.display }
-        if (command.characterIndex !== -1) {
-          priv.showText.characterIndex = command.characterIndex;
-          priv.showText.character = priv.logic.characters[command.characterIndex];
-          priv.showText.localizedCharacter = priv.dialogue.characters[command.characterIndex];
-        }
-        stop = true;
+        priv.message = Messages.Text.handleCommand(
+          priv.message, command, priv.logic.characters, priv.dialogue.characters
+        );
       } else if (command.external != null) {
         console.log(`External Command: ${command.external}`)
         console.log(command);
@@ -134,7 +144,9 @@ export class Runtime {
     }
   }
 
-  get currentShowText() {  return privates.get(this).showText; }
+  get currentMessage() {  return privates.get(this).message; }
+
+  get currentCommand() { return privates.get(this).command; }
 
   /**
    * Returns if the runtime is ready to start
@@ -174,6 +186,12 @@ export class Runtime {
     const logic = privates.get(this).logic;
     if (logic == null) return [];
     return logic.variables;
+  }
+
+  get variables() {
+    const execState = privates.get(this).execState;
+    if (execState == null) return {};
+    return Object.assign({}, execState.variables);
   }
 
   /**
@@ -217,8 +235,11 @@ export class Runtime {
     if (execState == null) return [];
     return execState.visited.map((item) => {return item;});
   }
+
 }
 
 const ExportedFileIO = {Open: FileIO.Open, Types: FileIO.Types, Type: FileIO.Type}
+export { ExportedFileIO as FileIO };
 
-export { ExportedFileIO as FileIO }
+const ExternalMessages = Messages.ExternalMessages;
+export { ExternalMessages as Messages } 
