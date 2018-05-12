@@ -2,20 +2,20 @@
 
 import * as FileIO from '../fileIO';
 
-export function String(state, handle, offset, table) {
+export function String(ipState, handle, offset, table) {
   const stringIndex = FileIO.ReadVarInt(handle, offset);
-  state.args.push(table[stringIndex.data]);
+  ipState.args.unshift(table[stringIndex.data]);
   return { length: stringIndex.length };
 }
 
-export function Float(state, handle, offset) {
+export function Float(ipState, handle, offset) {
   const floatInfo = FileIO.ReadFloat(handle, offset); 
-  state.args.push(floatInfo.data);   
+  ipState.args.unshift(floatInfo.data);   
   return { length: floatInfo.length };
 }
 
-export function Int(state, handle, offset) {
+export function Int(ipState, handle, offset) {
   const intInfo = FileIO.ReadVarInt(handle, offset);
-  state.args.push(intInfo.data);
+  ipState.args.unshift(intInfo.data);
   return { length: intInfo.length }
 }

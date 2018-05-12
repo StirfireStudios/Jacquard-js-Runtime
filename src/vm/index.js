@@ -2,6 +2,7 @@
 
 import * as FileIO from '../fileIO';
 
+import createIP from './createIP';
 import * as Clear from './clear';
 import * as Command from './command';
 import * as DialogueBlock from './dialogueBlock';
@@ -14,142 +15,145 @@ import * as Static from './static';
 import * as Text from './text';
 import * as Variable from './variable';
 
-export function execute(state, logic, dialogue) {
+export { createIP };
+
+export function execute(state, ipState, logic, dialogue) {
   let start = logic.instructionStart;
-  let offset = state.logicOffset + logic.instructionStart;
+  let offset = ipState.logicOffset + logic.instructionStart;
   let handle = logic.handle;
   let stringTable = logic.strings;
-  let inDialogue = state.dialogueOffset !== -1
+  let inDialogue = ipState.dialogueOffset !== -1
   if (inDialogue) {
     start = dialogue.instructionStart;
     stringTable = dialogue.strings;
-    offset = state.dialogueOffset + dialogue.instructionStart;
+    offset = ipState.dialogueOffset + dialogue.instructionStart;
     handle = dialogue.handle;
   }
 
   const opCodeInfo = FileIO.ReadByte(handle, offset);
+  //console.log(`Opcode: ${opCodeInfo.data.toString(16)} offset: ${offset}, dialogue: ${inDialogue}`);
   offset += opCodeInfo.length;
   let retValue = null;
   switch(opCodeInfo.data) {
     case 0: // Noop
       break;
     case 1:
-      retValue = Text.Show(state);
+      retValue = Text.Show(state, ipState);
       break;
     case 65:
-      retValue = Command.Run(state);
+      retValue = Command.Run(ipState);
       break;
     case 129:
-      retValue = DialogueBlock.Show(state, handle, offset, dialogue);
+      retValue = DialogueBlock.Show(state, ipState, handle, offset, dialogue);
       break;
     case 193: // Dialog Block End
       offset = -1;
       break;
     case 2:
-      retValue = Node.Entry(state, handle, offset);
+      retValue = Node.Entry(handle, offset);
       break;
     case 3:
-      retValue = Jump.Unconditional(state, handle, offset);
+      retValue = Jump.Unconditional(handle, offset);
       break;
     case 67:
-      retValue = Jump.IfTrue(state, handle, offset);
+      retValue = Jump.IfTrue(ipState, handle, offset);
       break;
     case 131:
-      retValue = Jump.IfFalse(state, handle, offset);
+      retValue = Jump.IfFalse(ipState, handle, offset);
       break;
     case 16: 
-      retValue = Variable.Load(state, handle, offset, logic);
+      retValue = Variable.Load(handle, offset, logic);
       break;
     case 144:
-      retValue = Variable.Set(state, handle, offset, logic);
+      retValue = Variable.Set(state, ipState, handle, offset, logic);
       break;
     case 17: // Static Null
-      state.args.push(null);
+      ipState.args.push(null);
       break;
     case 81: // Static True
-      state.args.push(true);
+      ipState.args.push(true);
       break;
     case 145: // Static false
-      state.args.push(false);
+      ipState.args.push(false);
       break;
     case 209: 
-      retValue = Static.String(state, handle, offset, stringTable);
+      retValue = Static.String(ipState, handle, offset, stringTable);
       break;
     case 18:
-      retValue = Static.Float(state, handle, offset);
+      retValue = Static.Float(ipState, handle, offset);
       break;
     case 82:
-      retValue = Static.Int(state, handle, offset);
+      retValue = Static.Int(ipState, handle, offset);
       break;
     case 19:
-      retValue = Operator.Add(state, handle, offset);
+      retValue = Operator.Add(ipState, handle, offset);
       break;
     case 83:
-      retValue = Operator.Subtract(state, handle, offset);
+      retValue = Operator.Subtract(ipState, handle, offset);
       break;
     case 20:
-      retValue = Operator.Multiply(state, handle, offset);
+      retValue = Operator.Multiply(ipState, handle, offset);
       break;
     case 84:
-      retValue = Operator.Divide(state, handle, offset);
+      retValue = Operator.Divide(ipState, handle, offset);
       break;
     case 148:
-      retValue = Operator.Modulus(state, handle, offset);
+      retValue = Operator.Modulus(ipState, handle, offset);
       break;
     case 21:
-      retValue = Operator.Equal(state, handle, offset);
+      retValue = Operator.Equal(ipState, handle, offset);
       break;
     case 85:
-      retValue = Operator.Not(state, handle, offset);
+      retValue = Operator.Not(ipState, handle, offset);
       break;
     case 22:
-      retValue = Operator.And(state, handle, offset);
+      retValue = Operator.And(ipState, handle, offset);
       break;
     case 86:
-      retValue = Operator.Or(state, handle, offset);
+      retValue = Operator.Or(ipState, handle, offset);
       break;
     case 150:
-      retValue = Operator.Xor(state, handle, offset);
+      retValue = Operator.Xor(ipState, handle, offset);
       break;
     case 23:
-      retValue = Operator.GreaterThan(state, handle, offset);
+      retValue = Operator.GreaterThan(ipState, handle, offset);
       break;
     case 87:
-      retValue = Operator.LessThan(state, handle, offset);
+      retValue = Operator.LessThan(ipState, handle, offset);
       break;
     case 24:
-      retValue = Function.Return(state, handle, offset, logic);
+      retValue = Function.Return(ipState, handle, offset, logic);
       break;
     case 88:
-      retValue = Function.NoReturn(state, handle, offset, logic);
+      retValue = Function.NoReturn(ipState, handle, offset, logic);
       break;
     case 40:
-      retValue = Option.Push(state, handle, offset, start);
+      retValue = Option.Push(ipState, handle, offset, start);
       break;
     case 41:
-      retValue = Option.Run(state);
+      retValue = Option.Run(ipState);
       break;      
     case 253:
-      retValue = Clear.Arguments(state, handle, offset);
+      retValue = Clear.Arguments(ipState, handle, offset);
       break;
     case 254:
-      retValue = Clear.Options(state, handle, offset);
+      retValue = Clear.Options(ipState, handle, offset);
       break;
     default:
       retValue = { data: { external: "Unknown Opcode" } };
   }
 
   if (retValue != null && retValue.length) offset += retValue.length;
-  if (retValue != null && retValue.offset) offset = offset + start;
+  if (retValue != null && retValue.offset) offset = retValue.offset + start;
 
   if (inDialogue) {
     if (offset == -1) {
-      state.dialogueOffset = -1;
+      ipState.dialogueOffset = -1;
     } else {
-      state.dialogueOffset = offset - start;
+      ipState.dialogueOffset = offset - start;
     }
   } else {
-    state.logicOffset = offset - start;
+    ipState.logicOffset = offset - start;
   }
 
   if (retValue != null && retValue.data != null) 

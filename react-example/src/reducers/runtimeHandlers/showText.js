@@ -1,6 +1,4 @@
-'use strict';
-
-export default function addNewText(state, message) {
+export default function handle(state, message) {
   for(let line of message.parts) {
     let textString = "";
     if (line.localizedCharacterName != null) {

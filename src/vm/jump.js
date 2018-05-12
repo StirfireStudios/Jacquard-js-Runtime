@@ -2,23 +2,23 @@
 
 import * as FileIO from '../fileIO';
 
-export function Unconditional(state, handle, offset) {
+export function Unconditional(handle, offset) {
   const newOffset = FileIO.ReadVarInt(handle, offset);
   return {length: newOffset.length, offset: newOffset.data};
 }
 
-export function IfTrue(state, handle, offset) {
+export function IfTrue(ipState, handle, offset) {
   const newOffset = FileIO.ReadVarInt(handle, offset);
-  if (state.args.pop()) {
+  if (ipState.args.pop()) {
     return {length: newOffset.length, offset: newOffset.data};
   } else {
     return {length: newOffset.length};
   }
 }
 
-export function IfFalse(state, handle, offset) {
+export function IfFalse(ipState, handle, offset) {
   const newOffset = FileIO.ReadVarInt(handle, offset);
-  if (state.args.pop()) {
+  if (ipState.args.pop()) {
     return {length: newOffset.length};    
   } else {
     return {length: newOffset.length, offset: newOffset.data};

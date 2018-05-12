@@ -4,7 +4,9 @@ import * as JacquardRuntime from '../jacquard-js-runtime'
 import * as DataActions from '../actions/data';
 import * as RuntimeActions from '../actions/runtime';
 
-import handleShowText from './runtime/showText';
+import handleShowText from './runtimeHandlers/showText';
+import handleCommand from './runtimeHandlers/command';
+import handleOptions from './runtimeHandlers/options';
 
 const runtime = new JacquardRuntime.Runtime();
 
@@ -16,7 +18,7 @@ function convertType(textType) {
   return JacquardRuntime.FileIO.Types.Unknown;
 }
 
-function updateWithRuntimeData(state) {
+function updateWithRuntimeData(state, runMode) {
   if (!runtime.ready) {
     return {
       ...state,
@@ -33,6 +35,7 @@ function updateWithRuntimeData(state) {
 
   const newState = {
     ...state,
+    runMode: runMode,
     ready: true,
     characters: runtime.characters,
     variables: runtime.variableList,
@@ -43,11 +46,28 @@ function updateWithRuntimeData(state) {
     nodeHistory: runtime.nodeHistory,
   }
 
-  if (runtime.currentMessage != null) {
-    switch(runtime.currentMessage.constructor.name) {
-      case "ShowText":
-        handleShowText(newState, runtime.currentMessage);
-        break;
+  if (newState.options != null) return newState;
+
+  let keepRunning = newState.ready && newState.runMode != null;
+  while(keepRunning) {
+    keepRunning = newState.runMode !== "step";
+    runtime.run(newState.runMode === "step");
+    if (runtime.currentMessage != null) {
+      switch(runtime.currentMessage.constructor.name) {
+        case "ShowText":
+          handleShowText(newState, runtime.currentMessage);
+          break;
+        case "Command":
+          handleCommand(newState, runtime.currentMessage);
+          keepRunning = keepRunning && newState.runState !== "toCommand";
+          break;
+        case "Options":
+          handleOptions(newState, runtime.currentMessage, runtime);
+          keepRunning = false;
+          break;
+        default:
+          break;
+      }
     }
   }
 
@@ -72,18 +92,16 @@ export default createReducer({
     return updateWithRuntimeData(state);
   },
   [RuntimeActions.Run]: (state) => {
-    runtime.run();
-    return updateWithRuntimeData(state);
+    return updateWithRuntimeData(state, "toOption");
   },
   [RuntimeActions.RunStep]: (state) => {
-    runtime.run(true);
-    return updateWithRuntimeData(state);
+    return updateWithRuntimeData(state, "step");
   },
 }, {
   ready: false,
   active: false,
-  runMode: "toOption",
-  waitingFor: "start",
+  runMode: null,
+  options: null,
   characters: [],
   variables: [],
   functions: [],

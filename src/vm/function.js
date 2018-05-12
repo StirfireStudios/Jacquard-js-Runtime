@@ -12,7 +12,7 @@ function functionData(stateArgs, handle, offset) {
   for(let index = 0; index < argsInfo.data; index++) {
     const argIndexInfo = FileIO.ReadByte(handle, length + offset);
     length += argIndexInfo.length;
-    args.push(stateArgs[stateArgs.length - (1 + argIndexInfo.data)]);
+    args.push(stateArgs[argIndexInfo.data]);
   }
   return {
     length: length,
@@ -21,8 +21,8 @@ function functionData(stateArgs, handle, offset) {
   }
 }
 
-export function Return(state, handle, offset, logic) {
-  const result = functionData(state.args, handle, offset);
+export function Return(ipState, handle, offset, logic) {
+  const result = functionData(ipState.args, handle, offset);
   return {
     data: {
       function: logic.functions[result.index],
@@ -33,8 +33,8 @@ export function Return(state, handle, offset, logic) {
   }
 }
 
-export function NoReturn(state, handle, offset, logic) {
-  const result = functionData(state.args, handle, offset);
+export function NoReturn(ipState, handle, offset, logic) {
+  const result = functionData(ipState.args, handle, offset);
   return {
     data: {
       function: logic.functions[result.index],

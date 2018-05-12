@@ -3,7 +3,7 @@
 import * as FileIO from '../fileIO';
 
 
-function clearStack(state, arrayName, handle, offset) {
+function clearStack(ipState, arrayName, handle, offset) {
   let length = 0;
   const startIndexInfo = FileIO.ReadByte(handle, offset);
   length += startIndexInfo.length;
@@ -11,17 +11,17 @@ function clearStack(state, arrayName, handle, offset) {
   const lengthInfo = FileIO.ReadByte(handle, offset);
   length += lengthInfo.length;
 
-  const orgArray = state[arrayName].reverse();
-  state[arrayName] = [];
+  const orgArray = ipState[arrayName];
+  ipState[arrayName] = [];
 
   for(let index = 0; index < orgArray.length; index++) {
     if (index < startIndexInfo.data) {
-      state[arrayName].push(orgArray[index]);
+      ipState[arrayName].push(orgArray[index]);
       continue;
     } 
     if (lengthInfo.data == 255) break;
     if (index > startIndexInfo.data + lengthInfo.data) {
-      state[arrayName].push(orgArray[index]);
+      ipState[arrayName].push(orgArray[index]);
     }
   }
 
@@ -29,10 +29,10 @@ function clearStack(state, arrayName, handle, offset) {
 }
 
 
-export function Arguments(state, handle, offset) {
-  return clearStack(state, "args", handle, offset);
+export function Arguments(ipState, handle, offset) {
+  return clearStack(ipState, "args", handle, offset);
 }
 
-export function Options(state, handle, offset) {
-  return clearStack(state, "options", handle, offset);
+export function Options(ipState, handle, offset) {
+  return clearStack(ipState, "options", handle, offset);
 }

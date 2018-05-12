@@ -2,123 +2,96 @@
 
 import * as FileIO from '../fileIO';
 
-function getLeftRightOperands(handle, offset) {
+function getLeftRightOperands(ipState, handle, offset) {
   const leftIndex = FileIO.ReadVarInt(handle, offset);
   const rightIndex = FileIO.ReadVarInt(handle, offset + leftIndex.length);
 
   return {
-    left: leftIndex.data,
-    right: rightIndex.data,
+    left: ipState.args[leftIndex.data],
+    right: ipState.args[rightIndex.data],
     length: leftIndex.length + rightIndex.length,
   }
 }
 
-function getOperand(handle, offset) {
+function getOperand(ipState, handle, offset) {
   const index = FileIO.ReadVarInt(handle, offset);
 
   return {
-    value: index.data,
+    value: ipState.args[index.data],
     length: index.length,
   }
 }
 
-export function Add(state, handle, offset) {
+export function Add(ipState, handle, offset) {
   const operands = getLeftRightOperands(handle, offset);
-  return {
-    data: operands.left + operands.right,
-    length: operands.length,
-  }
+  ipState.args.unshift(operands.left + operands.right);
+  return { length: operands.length };
 }
 
-export function Subtract(state, handle, offset) {
+export function Subtract(ipState, handle, offset) {
   const operands = getLeftRightOperands(handle, offset);
-  return {
-    data: operands.left - operands.right,
-    length: operands.length,
-  }
+  ipState.args.unshift(operands.left - operands.right);
+  return { length: operands.length };
 }
 
-export function Multiply(state, handle, offset) {
+export function Multiply(ipState, handle, offset) {
   const operands = getLeftRightOperands(handle, offset);
-  return {
-    data: operands.left * operands.right,
-    length: operands.length,
-  }
+  ipState.args.unshift(operands.left * operands.right);
+  return { length: operands.length };
 }
 
-export function Divide(state, handle, offset) {
+export function Divide(ipState, handle, offset) {
   const operands = getLeftRightOperands(handle, offset);
-  return {
-    data: operands.left / operands.right,
-    length: operands.length,
-  }
+  ipState.args.unshift(operands.left / operands.right);
+  return { length: operands.length };
 }
 
-export function Modulus(state, handle, offset) {
+export function Modulus(ipState, handle, offset) {
   const operands = getLeftRightOperands(handle, offset);
-  return {
-    data: operands.left % operands.right,
-    length: operands.length,
-  }
+  ipState.args.unshift(operands.left % operands.right);
+  return { length: operands.length };
 }
 
-export function Equal(state, handle, offset) {
+export function Equal(ipState, handle, offset) {
   const operands = getLeftRightOperands(handle, offset);
-  return {
-    data: operands.left == operands.right,
-    length: operands.length,
-  }
+  ipState.args.unshift(operands.left == operands.right);
+  return { length: operands.length };
 }
 
-export function Not(state, handle, offset) {
+export function Not(ipState, handle, offset) {
   const operand = getOperand(handle, offset);
-  return {
-    data: !operand.value,
-    length: operand.length,
-  }
+  ipState.args.unshift(!operands.value);
+  return { length: operands.length };
 }
 
-export function And(state, handle, offset) {
+export function And(ipState, handle, offset) {
   const operands = getLeftRightOperands(handle, offset);
-  return {
-    data: operands.left && operands.right,
-    length: operands.length,
-  }
+  ipState.args.unshift(operands.left && operands.right);
+  return { length: operands.length };
 }
 
-export function Or(state, handle, offset) {
+export function Or(ipState, handle, offset) {
   const operands = getLeftRightOperands(handle, offset);
-  return {
-    data: operands.left || operands.right,
-    length: operands.length,
-  }
+  ipState.args.unshift(operands.left || operands.right);
+  return { length: operands.length };
 }
 
-export function Xor(state, handle, offset) {
+export function Xor(ipState, handle, offset) {
   const operands = getLeftRightOperands(handle, offset);
   const or = operands.left || operands.right;
   const and = operands.left && operands.right;
-
-  return {
-    data: (or && !and),
-    length: operands.length,
-  }
+  ipState.args.unshift(or && !and);
+  return { length: operands.length };
 }
 
-export function GreaterThan(state, handle, offset) {
+export function GreaterThan(ipState, handle, offset) {
   const operands = getLeftRightOperands(handle, offset);
-
-  return {
-    data: operands.left > operands.right,
-    length: operands.length,
-  }
+  ipState.args.unshift(operands.left > operands.right);
+  return { length: operands.length };
 }
 
-export function LessThan(state, handle, offset) {
+export function LessThan(ipState, handle, offset) {
   const operands = getLeftRightOperands(handle, offset);
-
-  return {
-    data: operands.left < operands.right,
-    length: operands.length,
-  }
+  ipState.args.unshift(operands.left < operands.right);
+  return { length: operands.length };
 }

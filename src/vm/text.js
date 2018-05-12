@@ -2,11 +2,11 @@
 
 import * as FileIO from '../fileIO';
 
-export function Show(state) {
+export function Show(state, ipState) {
   return {
     length: 0,
     data: {
-      display: state.args.join(""),
+      display: ipState.args.join(""),
       characterIndex: state.characterIndex,
     }
   };

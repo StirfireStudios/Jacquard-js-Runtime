@@ -24,13 +24,10 @@ function checkReady() {
     priv.ready = false;
     return;
   } else {
-    priv.execState = {
+    priv.IP = VM.createIP();
+    priv.state = {
       variables: {},
-      args: [],
-      options: [],
       visited: [],
-      logicOffset: 0,
-      dialogueOffset: -1,
     }
     priv.ready = true;
   }
@@ -111,7 +108,7 @@ export class Runtime {
   }
 
   /**
-   * Run the bytecode
+   * Run the main state bytecode
    * @param {*} singleInstruction - run only one instruction at a time
    */
   run(singleInstruction) {
@@ -119,34 +116,40 @@ export class Runtime {
     priv.message = null;
     let stop = false;
     while(!stop) {
-      const command = VM.execute(priv.execState, priv.logic, priv.dialogue);
+      const command = VM.execute(priv.state, priv.IP, priv.logic, priv.dialogue);
       stop = singleInstruction;
       if (command == null) {
       } else if (command.enterNode != null) {
-        priv.execState.visited.push(priv.logic.nodeNames[command.enterNode]);
+        priv.state.visited.push(priv.logic.nodeNames[command.enterNode]);
       } else if (command.function != null) {
         console.log("Run function:");
         console.log(command.function); 
         stop = true;
       } else if (command.options != null) {
-        console.log(`Run options:`);
-        console.log(command.options);
+        priv.message = Messages.Options.handleCommand(command);
         stop = true;
       } else if (command.display != null) {
         priv.message = Messages.Text.handleCommand(
           priv.message, command, priv.logic.characters, priv.dialogue.characters
         );
+        stop = true;
       } else if (command.external != null) {
-        console.log(`External Command: ${command.external}`)
-        console.log(command);
+        debugger;
+        priv.message = Messages.Command.handleCommand(priv.message, command);
         stop = true;
       }  
     }
   }
 
+  moveInstructionPointerTo(newState) {
+
+  }
+
   get currentMessage() {  return privates.get(this).message; }
 
   get currentCommand() { return privates.get(this).command; }
+
+  get currentInstructionPointer() { return privates.get(this).IP; } 
 
   /**
    * Returns if the runtime is ready to start
