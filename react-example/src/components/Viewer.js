@@ -26,12 +26,18 @@ function renderLists() {
   if (this.props.showState) {
     const state = this.props.state;
     const list = Object.keys(state).map((name) => {
-      return `${name}: ${state[name]}`;
+      return {name: name, value: state[name]}
     });
     output.push(
       <ListView 
         list={list} 
         name="state"
+        lineRenderer={(item) => {
+          return <span>
+            <label className="variable">{item.name}:</label>
+            <span className="value">{item.value}</span>
+          </span>
+        }}
         hideFunc={onClick.bind(this, "State", false)}
       />
     );
@@ -52,6 +58,12 @@ function renderLists() {
       <ListView 
         list={this.props.nodeNames} 
         name="nodes" 
+        lineRenderer={(item) => {
+          return <span>
+            <label className="variable">{item}</label>
+            <button onClick={RuntimeActions.MoveToNode.bind(null, item)}>Move to {item}</button>
+          </span>
+        }}
         hideFunc={onClick.bind(this, "NodeNames", false)}
       />
     );

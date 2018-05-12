@@ -36,3 +36,7 @@
 .buttons button {
   height: 20px;
 }
+
+label.variable {
+  font-weight: bold;
+}

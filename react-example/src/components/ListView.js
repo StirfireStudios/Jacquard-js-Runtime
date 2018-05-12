@@ -8,12 +8,20 @@ function renderHideButton() {
   }
 }
 
+function defaultLineRenderer(value) {
+  return (<span>{value}</span>);
+}
+
 export default class ListView extends Component {
   render() {
     const list = [];
+    let lineRenderer = this.props.lineRenderer;
+    console.log(typeof(lineRenderer));
+    if (typeof(lineRenderer) !== 'function') lineRenderer = defaultLineRenderer; 
+
     for(let index = 0; index < this.props.list.length; index++) {
       list.push(
-        <div key={index}>{this.props.list[index]}</div>
+        <div key={index}>{lineRenderer(this.props.list[index])}</div>
       );
     }
 

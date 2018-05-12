@@ -21,10 +21,16 @@ export default class Logic extends Base.BaseReader {
     privates.set(this, priv);
   }
 
+  getOffsetForNode(name) {
+    const offset = privates.get(this).nodes[name]
+    return offset == null ? -1 : offset;
+  }
+
   get characters() { return privates.get(this).characters; }
   get functions() { return privates.get(this).functions; }
   get variables() { return privates.get(this).variables; }
   get strings() { return privates.get(this).strings; }
   get nodeNames() { return Object.keys(privates.get(this).nodes); }
+
 
 }

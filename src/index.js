@@ -145,6 +145,17 @@ export class Runtime {
     priv.IP = newIP;
   }
 
+  moveInstructionPointerToNode(nodeName) {
+    const logic = privates.get(this).logic;
+    if (logic == null) return false;
+    const newOffset = logic.getOffsetForNode(nodeName);
+    if (newOffset < 0) return false
+    const IP = privates.get(this).IP;
+    IP.logicOffset = newOffset;
+    IP.dialogueOffset = -1;
+    return true;
+  }
+
   get currentMessage() {  return privates.get(this).message; }
 
   get currentCommand() { return privates.get(this).command; }

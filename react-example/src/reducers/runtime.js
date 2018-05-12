@@ -105,6 +105,15 @@ export default createReducer({
     runtime.moveInstructionPointerTo(option.data);
     return updateWithRuntimeData(state, state.runMode);
   },
+  [RuntimeActions.MoveToNode]: (state, nodeName) => {
+    if (runtime.moveInstructionPointerToNode(nodeName)) {
+      state.options = null;
+      state.text = [];
+      return updateWithRuntimeData(state);  
+    } else {
+      return state;
+    }
+  },
 }, {
   ready: false,
   active: false,
