@@ -134,8 +134,7 @@ export class Runtime {
         );
         stop = true;
       } else if (command.external != null) {
-        debugger;
-        priv.message = Messages.Command.handleCommand(priv.message, command);
+        priv.message = Messages.Command.handleCommand(command);
         stop = true;
       }  
     }
@@ -193,9 +192,9 @@ export class Runtime {
   }
 
   get variables() {
-    const execState = privates.get(this).execState;
-    if (execState == null) return {};
-    return Object.assign({}, execState.variables);
+    const state = privates.get(this).state;
+    if (state == null) return {};
+    return Object.assign({}, state.variables);
   }
 
   /**
@@ -235,9 +234,9 @@ export class Runtime {
   }
 
   get nodeHistory() {
-    const execState = privates.get(this).execState;
-    if (execState == null) return [];
-    return execState.visited.map((item) => {return item;});
+    const state = privates.get(this).state;
+    if (state == null) return [];
+    return state.visited.map((item) => {return item;});
   }
 
 }

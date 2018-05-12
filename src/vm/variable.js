@@ -9,8 +9,9 @@ export function Set(state, ipState, handle, offset, logic) {
   return {length: varIndex.length};
 }
 
-export function Load(handle, offset, logic) {
+export function Load(state, ipState, handle, offset, logic) {
   const varIndex = FileIO.ReadVarInt(handle, offset);
   const varName = logic.variables[varIndex.data];
+  ipState.args.unshift(state.variables[varName]);
   return {length: varIndex.length};
 }

@@ -35,23 +35,17 @@ function updateWithRuntimeData(state, runMode) {
 
   const newState = {
     ...state,
-    runMode: runMode,
+    runMode: runMode != null ? runMode : state.runMode,
     ready: true,
-    characters: runtime.characters,
-    variables: runtime.variableList,
-    variableState: {},
-    functions: runtime.functionList,
-    dialogueLoaded: runtime.dialogueLoaded,
-    nodeNames: runtime.nodeNames,
-    nodeHistory: runtime.nodeHistory,
-  }
-
-  if (newState.options != null) return newState;
-
+    options: state.options != null ? state.options.map((item) => (item)) : null,
+    text: state.text.map((item) => (item)),
+  };
+   
   let keepRunning = newState.ready && newState.runMode != null;
+  keepRunning = keepRunning && newState.options == null;
   while(keepRunning) {
-    keepRunning = newState.runMode !== "step";
-    runtime.run(newState.runMode === "step");
+    keepRunning = runMode !== "step";
+    runtime.run(runMode === "step");
     if (runtime.currentMessage != null) {
       switch(runtime.currentMessage.constructor.name) {
         case "ShowText":
@@ -70,6 +64,14 @@ function updateWithRuntimeData(state, runMode) {
       }
     }
   }
+
+  newState.characters = runtime.characters;
+  newState.variables = runtime.variableList;
+  newState.variableState = runtime.variables;
+  newState.functions = runtime.functionList;
+  newState.dialogueLoaded = runtime.dialogueLoaded;
+  newState.nodeNames = runtime.nodeNames;
+  newState.nodeHistory = runtime.nodeHistory;
 
   return newState;
 }
@@ -96,6 +98,12 @@ export default createReducer({
   },
   [RuntimeActions.RunStep]: (state) => {
     return updateWithRuntimeData(state, "step");
+  },
+  [RuntimeActions.OptionSelect]: (state, option) => {
+    state.options = null;
+    state.text.push(`-> Selected ${option.text}`);
+    runtime.moveInstructionPointerTo(option.data);
+    return updateWithRuntimeData(state, state.runMode);
   },
 }, {
   ready: false,

@@ -23,8 +23,18 @@ function renderLists() {
     );
   }
   
-  if (this.props.showState) {    
-    output.push(<div className="state" key="state">Varible State List!</div>);
+  if (this.props.showState) {
+    const state = this.props.state;
+    const list = Object.keys(state).map((name) => {
+      return `${name}: ${state[name]}`;
+    });
+    output.push(
+      <ListView 
+        list={list} 
+        name="state"
+        hideFunc={onClick.bind(this, "State", false)}
+      />
+    );
   }
   
   if (this.props.showVariables) {
@@ -67,9 +77,24 @@ function renderTextWindow() {
     text.push(<div key={index}>{textLine}</div>);
   }
 
+  const options = [];
+  let optionIndex = 0;
+  if (this.props.options != null) {
+    for(let option of this.props.options) {
+      const action = RuntimeActions.OptionSelect.bind(null, option)
+      options.push(
+        <div key={optionIndex}>
+          <button onClick={action}>{option.text}</button>
+        </div>
+      )
+      optionIndex++;
+    }
+  }
+
   return (
     <div key="display" className="display">
       {text}
+      {options}
     </div>
   );
 }
@@ -91,13 +116,13 @@ function renderPlaybackButtons() {
   if (!this.started) {
     let func = runtimeAction.bind(RuntimeActions.Run);
     playbackButtons.push(
-      <button key="startNormal" onClick={func}>
+      <button key="startNormal" onClick={func} disabled={this.props.optionWait} >
         Start (Normal)
       </button>
     );
     func = runtimeAction.bind(RuntimeActions.RunStep);    
     playbackButtons.push(
-      <button key="startStep" onClick={func}>
+      <button key="startStep" onClick={func} disabled={this.props.optionWait}>
         Start (Single Step)
       </button>
     );
@@ -136,7 +161,8 @@ function mapStateToProps(state) {
   return {
     ready: state.Runtime.ready,
     started: state.Runtime.waitingFor !== "start",
-    optionWait: state.Runtime.waitingFor !== "optionSelect",
+    optionWait: state.Runtime.options !== null,
+    options: state.Runtime.options,
     characters: state.Runtime.characters,
     showCharacters: state.View.showCharacters,
     state: state.Runtime.variableState,

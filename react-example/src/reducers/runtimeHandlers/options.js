@@ -2,12 +2,11 @@ import handleShowText from './showText';
 import handleCommand from './command';
 
 export default function handle(state, message, runtime) {
-  debugger;
   state.originalIP = runtime.currentInstructionPointer;
   state.options = [];
   const options = message.options;
   for(let optionIP of options) {
-    const option = {IP: optionIP, text: []};
+    const option = {data: optionIP, text: []};
     runtime.moveInstructionPointerTo(optionIP);
     let keepRunning = true;
     while(keepRunning) {

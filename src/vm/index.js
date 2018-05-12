@@ -62,7 +62,7 @@ export function execute(state, ipState, logic, dialogue) {
       retValue = Jump.IfFalse(ipState, handle, offset);
       break;
     case 16: 
-      retValue = Variable.Load(handle, offset, logic);
+      retValue = Variable.Load(state, ipState, handle, offset, logic);
       break;
     case 144:
       retValue = Variable.Set(state, ipState, handle, offset, logic);

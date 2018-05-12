@@ -4,7 +4,7 @@ const privates = new WeakMap();
 
 export function handleCommand(command) {
   const message = new Command();
-  privates.set(message, { args: command.values.map((item) => (item)) });
+  privates.set(message, { args: command.args.map((item) => (item)) });
   return message;
 }
 
