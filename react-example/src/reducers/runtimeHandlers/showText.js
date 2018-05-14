@@ -5,6 +5,6 @@ export default function handle(textArray, message) {
       textString += line.localizedCharacterName + ": ";
     }
     textString += line.text;
-    textArray.push(textString);  
+    textArray.push({ text: textString});  
   }
 }

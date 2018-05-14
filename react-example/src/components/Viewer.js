@@ -86,7 +86,16 @@ function renderTextWindow() {
   const text = [];
   for(let index = 0; index < this.props.text.length; index++) {
     const textLine = this.props.text[index];
-    text.push(<div key={index}>{textLine}</div>);
+    if (textLine.text != null) {
+      text.push(<div key={index} className="textLine">{textLine.text}</div>);
+    } else if (textLine.command != null) {
+      let argNum = -1;
+      const commandText = textLine.command.map((arg) => {
+        argNum += 1;
+        return <span key={argNum} className="argument">{arg}</span>;
+      })
+      text.push(<div key={index} className="command">{commandText}</div>);
+    }
   }
 
   const options = [];
@@ -96,7 +105,7 @@ function renderTextWindow() {
       const action = RuntimeActions.OptionSelect.bind(null, option)
       options.push(
         <div key={optionIndex}>
-          <button onClick={action}>{option.text}</button>
+          <button onClick={action}>{option.text[0].text}</button>
         </div>
       )
       optionIndex++;

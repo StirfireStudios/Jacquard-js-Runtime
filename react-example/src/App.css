@@ -27,6 +27,19 @@
   overflow: auto;
 }
 
+.display .command {
+  margin-top: 2px;
+  margin-left: 5px;
+  margin-bottom: 2px;
+}
+
+.display .command .argument {
+  font-family: monospace;
+  border: 1px solid blue;
+  padding: 2px;
+  margin: 5px;
+}
+
 .buttons {
   position: fixed;
   bottom: 0;
