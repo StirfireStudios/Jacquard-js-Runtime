@@ -1,15 +1,30 @@
 'use strict';
 
-import * as Text from './text';
 import * as Command from './command';
-import * as Options from './options';
 import EndOfFile from './endoffile';
+import Halt from './halt';
+import NodeChange from './nodeChange';
+import * as Options from './options';
+import * as Text from './text';
+import * as Variable from './variable';
 
 const ExternalMessages = {
-  Text: Text.externals,
   Command: Command.externals,
-  Options: Options.externals,
   EndOfFile: EndOfFile,
+  Halt: Halt,
+  NodeChange: NodeChange,
+  Options: Options.externals,
+  Text: Text.externals,
+  Variable: Variable,
 }
 
-export {Text, Command, ExternalMessages, EndOfFile, Options};
+export {
+  Command, 
+  ExternalMessages, 
+  EndOfFile, 
+  Halt,
+  NodeChange,
+  Options, 
+  Text,
+  Variable,
+};
