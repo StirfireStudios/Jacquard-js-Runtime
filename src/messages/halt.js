@@ -2,7 +2,7 @@
 
 const privates = new WeakMap();
 
-export default class HaltExec {
+export default class Halt {
   constructor(message) {
     privates.set(this, {message: message});
   }

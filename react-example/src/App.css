@@ -27,10 +27,36 @@
   overflow: auto;
 }
 
+.display .nodeEntry:before {
+  content: "Entering Node: ";
+}
+
+.display .nodeEntry {
+  font-family: monospace;
+  border: 1px solid green;
+  padding: 2px;
+  margin: 5px;
+}
+
+.display .optionText:before {
+  content: "Player Selected: ";
+}
+
+.display .optionText {
+  font-family: monospace;
+  border: 1px dashed grey;
+  padding: 2px;
+  margin: 5px;
+}
+
 .display .command {
   margin-top: 2px;
   margin-left: 5px;
   margin-bottom: 2px;
+}
+
+.display .command:before {
+  content: "Command: ";
 }
 
 .display .command .argument {

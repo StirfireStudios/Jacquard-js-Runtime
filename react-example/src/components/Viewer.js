@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 import React, { Component } from 'react';
 
 import ListView from './ListView';
+import TextWindow from './Viewer/TextWindow';
 
 import * as RuntimeActions from '../actions/runtime';
 import * as ViewActions from '../actions/view';
@@ -82,44 +83,6 @@ function renderLists() {
   return <div className="lists" key="lists">{output}</div>;
 }
 
-function renderTextWindow() {
-  const text = [];
-  for(let index = 0; index < this.props.text.length; index++) {
-    const textLine = this.props.text[index];
-    if (textLine.text != null) {
-      text.push(<div key={index} className="textLine">{textLine.text}</div>);
-    } else if (textLine.command != null) {
-      let argNum = -1;
-      const commandText = textLine.command.map((arg) => {
-        argNum += 1;
-        return <span key={argNum} className="argument">{arg}</span>;
-      })
-      text.push(<div key={index} className="command">{commandText}</div>);
-    }
-  }
-
-  const options = [];
-  let optionIndex = 0;
-  if (this.props.options != null) {
-    for(let option of this.props.options) {
-      const action = RuntimeActions.OptionSelect.bind(null, option)
-      options.push(
-        <div key={optionIndex}>
-          <button onClick={action}>{option.text[0].text}</button>
-        </div>
-      )
-      optionIndex++;
-    }
-  }
-
-  return (
-    <div key="display" className="display">
-      {text}
-      {options}
-    </div>
-  );
-}
-
 function renderButton(key) {
   const visible = this.props[`show${key}`];
   const text = visible ? "Hide" : "Show";
@@ -137,13 +100,13 @@ function renderPlaybackButtons() {
   if (!this.started) {
     let func = runtimeAction.bind(RuntimeActions.Run);
     playbackButtons.push(
-      <button key="startNormal" onClick={func} disabled={this.props.optionWait} >
+      <button key="startNormal" onClick={func} disabled={this.props.disablePlayback} >
         Start (Normal)
       </button>
     );
     func = runtimeAction.bind(RuntimeActions.RunStep);    
     playbackButtons.push(
-      <button key="startStep" onClick={func} disabled={this.props.optionWait}>
+      <button key="startStep" onClick={func} disabled={this.props.disablePlayback}>
         Start (Single Step)
       </button>
     );
@@ -171,7 +134,13 @@ class Viewer extends Component {
     return (
       <div>
         {renderLists.call(this)}
-        {renderTextWindow.call(this)}
+        <TextWindow 
+          key="textDisplay"
+          className="display"
+          text={this.props.text}
+          options={this.props.options}
+          optionSelect={RuntimeActions.OptionSelect}
+        />
         {renderButtons.call(this)}        
       </div>
     );
@@ -182,7 +151,7 @@ function mapStateToProps(state) {
   return {
     ready: state.Runtime.ready,
     started: state.Runtime.waitingFor !== "start",
-    optionWait: state.Runtime.options !== null,
+    disablePlayback: (state.Runtime.options !== null) || (state.Runtime.halted),
     options: state.Runtime.options,
     characters: state.Runtime.characters,
     showCharacters: state.View.showCharacters,

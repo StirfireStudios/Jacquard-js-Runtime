@@ -18,6 +18,7 @@ import * as Variable from './variable';
 export { createIP };
 
 export function execute(state, ipState, logic, dialogue) {
+  if (ipState.halted) return;
   let start = logic.instructionStart;
   let offset = ipState.logicOffset + logic.instructionStart;
   let handle = logic.handle;
@@ -30,12 +31,10 @@ export function execute(state, ipState, logic, dialogue) {
     handle = dialogue.handle;
   }
 
-  if (offset >= FileIO.GetLength(handle)) {
-    return { stop: "end of file" }
-  }
+  if (offset >= FileIO.GetLength(handle)) return { endoffile: true };
 
   const opCodeInfo = FileIO.ReadByte(handle, offset);
-  console.log(`Opcode: ${opCodeInfo.data.toString(16)} offset: ${offset}, dialogue: ${inDialogue}`);
+//  console.log(`Opcode: ${opCodeInfo.data.toString(16)} offset: ${offset}, dialogue: ${inDialogue}`);
   offset += opCodeInfo.length;
   let retValue = null;
   switch(opCodeInfo.data) {
@@ -142,6 +141,9 @@ export function execute(state, ipState, logic, dialogue) {
       break;
     case 254:
       retValue = Clear.Options(ipState, handle, offset);
+      break;
+    case 255:
+      ipState.halted = true;
       break;
     default:
       retValue = { data: { stop: `Unknown Opcode ${opCodeInfo.data}` } };

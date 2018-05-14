@@ -115,12 +115,22 @@ export class Runtime {
     const priv = privates.get(this);
     priv.message = null;
     let stop = false;
-    while(!stop) {
+    while(!(stop || priv.IP.halted)) {
       const command = VM.execute(priv.state, priv.IP, priv.logic, priv.dialogue);
       stop = singleInstruction;
       if (command == null) {
       } else if (command.enterNode != null) {
-        priv.state.visited.push(priv.logic.nodeNames[command.enterNode]);
+        const nodeName = priv.logic.nodeNames[command.enterNode]
+        priv.message = new Messages.NodeChange(nodeName);
+        priv.state.visited.push(nodeName);
+        stop = true;
+      } else if (command.var != null) {
+        if (command.var.type === 'get') {
+          priv.message = new Messages.Variable.Load(command.var.name, command.var.value);
+        } else if (command.var.type === 'set') {
+          priv.message = new Messages.Variable.Save(command.var.name, command.var.value);
+        }
+        stop = true;
       } else if (command.function != null) {
         console.log("Run function:");
         console.log(command.function); 
@@ -136,11 +146,16 @@ export class Runtime {
       } else if (command.external != null) {
         priv.message = Messages.Command.handleCommand(command);
         stop = true;
-      } else if (command.stop != null) {
+      } else if (command.endOfFile != null) {
         priv.message = new Messages.EndOfFile(command.stop);
         console.error(`Stop because: ${command.stop}`)
         stop = true;
       }
+    }
+
+    if (priv.IP.halted) {
+      console.log("HALTED");
+      priv.message = new Messages.Halt("Halt instruction encountered");
     }
   }
 

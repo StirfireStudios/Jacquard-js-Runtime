@@ -7,6 +7,8 @@ import * as RuntimeActions from '../actions/runtime';
 import handleShowText from './runtimeHandlers/showText';
 import handleCommand from './runtimeHandlers/command';
 import handleOptions from './runtimeHandlers/options';
+import handleNodeChange from './runtimeHandlers/nodeChange';
+import handleVariable from './runtimeHandlers/variable';
 
 const runtime = new JacquardRuntime.Runtime();
 
@@ -48,6 +50,9 @@ function updateWithRuntimeData(state, runMode) {
     runtime.run(runMode === "step");
     if (runtime.currentMessage != null) {
       switch(runtime.currentMessage.constructor.name) {
+        case "NodeChange":
+          handleNodeChange(newState.text, runtime.currentMessage);
+          break;
         case "ShowText":
           handleShowText(newState.text, runtime.currentMessage);
           break;
@@ -59,9 +64,20 @@ function updateWithRuntimeData(state, runMode) {
           handleOptions(newState, runtime.currentMessage, runtime);
           keepRunning = false;
           break;
-        case "EndOfFile": 
+        case "EndOfFile":
           keepRunning = false;
+        case "Save":
+        case "Load":
+          handleVariable(newState.text, runtime.currentMessage);
+          break;  
+        case "Halt": 
+          newState.text.push({halted: true});
+          newState.halted = true;
+          keepRunning = false;
+          break;
         default:
+          console.log("Got message:");
+          console.log(runtime.currentMessage.constructor.name);
           break;
       }
     }
@@ -103,7 +119,7 @@ export default createReducer({
   },
   [RuntimeActions.OptionSelect]: (state, option) => {
     state.options = null;
-    state.text.push(`-> Selected ${option.text}`);
+    state.text.push({optionSelected: option});
     runtime.moveInstructionPointerTo(option.data);
     return updateWithRuntimeData(state, state.runMode);
   },
@@ -125,4 +141,5 @@ export default createReducer({
   variables: [],
   functions: [],
   nodeNames: [],
+  halted: false,
 });
