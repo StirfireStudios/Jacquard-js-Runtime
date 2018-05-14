@@ -51,7 +51,7 @@ export class BaseReader {
       handle: handle,
       version: versionInfo.data,
       offset: 5 + versionInfo.length,
-      length: 
+      length: FileIO.GetLength(handle),
     }
 
     privates.set(this, priv);
