@@ -8,7 +8,7 @@ function clearStack(ipState, arrayName, handle, offset) {
   const startIndexInfo = FileIO.ReadByte(handle, offset);
   length += startIndexInfo.length;
 
-  const lengthInfo = FileIO.ReadByte(handle, offset);
+  const lengthInfo = FileIO.ReadByte(handle, offset + length);
   length += lengthInfo.length;
 
   const orgArray = ipState[arrayName];

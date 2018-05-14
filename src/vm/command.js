@@ -7,7 +7,7 @@ export function Run(ipState) {
     length: 0,
     data: { 
       external: "runCommand", 
-      args: ipState.args
+      args: ipState.args.reverse()
     } 
   };
 }

@@ -35,7 +35,7 @@ function renderFileState() {
 function renderUploadButton() {
   if (this.props.busy) return <div>Loading...</div>;
   const handleFiles = onFileSelect.bind(this);
-  const types = [".jqrdd", ".jqrdl", ".jqrd.sourcemap"];
+  const types = [".jqrdd", ".jqrdl", ".sourcemap"];
   return (
     <div>
       <ReactFileReader 
