@@ -2,10 +2,9 @@
 
 const privates = new WeakMap();
 
-export default class EndOfFile {
-  constructor(message) {
-    privates.set(this, {message: message});
-  }
-
-  get message() { return privates.get(this).message; }
-}
+/** 
+ * We have reached the end of the file.
+ * @name EndOfFile
+ * @kind class
+ */
+export default class EndOfFile { }

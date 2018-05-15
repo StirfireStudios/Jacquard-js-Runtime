@@ -13,7 +13,7 @@ export default function handle(state, message, runtime) {
       const message = runtime.run();
       if (message != null) {
         switch(message.constructor.name) {
-          case "ShowText":
+          case "Show":
             handleShowText(option.text, message);
             keepRunning = false;
             break;

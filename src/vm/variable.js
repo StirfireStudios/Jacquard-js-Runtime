@@ -9,7 +9,7 @@ export function Set(state, ipState, handle, offset, logic) {
   state.variables[varName] = newValue;
   return {
     length: varIndex.length, 
-    data: { var: { type: 'set', name: varName, value: newValue }},
+    data: { var: { type: 'set', name: varName, value: newValue, index: varIndex.data}},
   };
 }
 
@@ -19,6 +19,6 @@ export function Load(state, ipState, handle, offset, logic) {
   ipState.args.unshift(state.variables[varName]);
   return {
     length: varIndex.length, 
-    data: { var: { type: 'get', name: varName, value: ipState.args[0] }},
+    data: { var: { type: 'get', name: varName, value: ipState.args[0], index: varIndex.data }},
   };
 }

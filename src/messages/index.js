@@ -9,11 +9,11 @@ import * as Text from './text';
 import * as Variable from './variable';
 
 const ExternalMessages = {
-  Command: Command.externals,
+  Command: Command.Command,
   EndOfFile: EndOfFile,
   Halt: Halt,
   NodeChange: NodeChange,
-  Options: Options.externals,
+  Options: Options.Options,
   Text: Text.externals,
   Variable: Variable,
 }

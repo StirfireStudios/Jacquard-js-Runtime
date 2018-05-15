@@ -8,8 +8,16 @@ export function handleCommand(command) {
   return message;
 }
 
+/** 
+ * An engine command to execute.
+ * @name Command
+ * @kind class
+ */
 export class Command {
+  /**
+   * The arguments of this command
+   * @memberof Command
+   * @return {string[]} arguments
+   */
   get args() { return privates.get(this).args; }
 }
-
-export const externals = { Command }

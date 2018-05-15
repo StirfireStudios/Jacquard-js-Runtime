@@ -1,5 +1,5 @@
 {
-  "name": "jacquard-js-runtime",
+  "name": "jacquard-runtime",
   "version": "0.1.0",
   "description": "a JS runtime for the Jacquard bytecode format",
   "main": "dist/index.js",

@@ -54,7 +54,7 @@ function updateWithRuntimeData(state, runMode) {
         case "NodeChange":
           handleNodeChange(newState.text, message);
           break;
-        case "ShowText":
+        case "Show":
           handleShowText(newState.text, message);
           break;
         case "Command":

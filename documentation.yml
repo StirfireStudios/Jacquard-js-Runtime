@@ -1,5 +1,20 @@
 toc:
-  - name: Runtime and messages
   - Runtime
-  - name: FileIO
+  - name: Runtime Messages
+    description: These are all in the "Messages" export
+  - Command
+  - EndOfFile
+  - Halt
+  - NodeChange
+  - Options
+  - name: Text Messages
+    description: These are in the "Messages.Text" export
+  - Show
+  - ShowPart
+  - name: Variable Messages
+    description: These are in the "Messages.Variable" export
+  - base
+  - Save
+  - Load
+  - name: FileIO Classes
   - FileIO

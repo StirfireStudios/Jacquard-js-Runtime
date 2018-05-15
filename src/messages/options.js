@@ -19,8 +19,12 @@ export function entryPointFor(option) {
   return privates.get(option).entryPoint;
 }
 
+/** 
+ * There are selectable options
+ */
 export class Options {
+  /** the Instruction Pointers for the options
+   * @return {InstructionPointer[]}
+   */
   get options() { return privates.get(this).options; }
 }
-
-export const externals = { Options }
