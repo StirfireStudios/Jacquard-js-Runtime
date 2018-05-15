@@ -9,6 +9,9 @@
 ## babel compiled stuff
 /dist/
 
+## temporary files
+/tmp/
+
 # Created by https://www.gitignore.io/api/node,macos,windows
 
 ### macOS ###

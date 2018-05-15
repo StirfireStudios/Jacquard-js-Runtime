@@ -10,15 +10,15 @@ export default function handle(state, message, runtime) {
     runtime.moveInstructionPointerTo(optionIP);
     let keepRunning = true;
     while(keepRunning) {
-      runtime.run();
-      if (runtime.currentMessage != null) {
-        switch(runtime.currentMessage.constructor.name) {
+      const message = runtime.run();
+      if (message != null) {
+        switch(message.constructor.name) {
           case "ShowText":
-            handleShowText(option.text, runtime.currentMessage);
+            handleShowText(option.text, message);
             keepRunning = false;
             break;
           case "Command":
-            handleCommand(option.text, runtime.currentMessage);
+            handleCommand(option.text, message);
             break;
           default:
             throw new Error("Can't display option due to bad command");

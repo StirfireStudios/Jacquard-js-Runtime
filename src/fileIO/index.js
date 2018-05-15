@@ -14,6 +14,13 @@ function unknownFileType() {
  * @name FileIO
  */
 
+/** 
+ * A handle to file data.
+ * @name FileIO.handle
+ * @memberof FileIO
+ * @kind object
+ */
+
 /**
  * Open some file data (currently the browser File API is supported) for later use
  * @name FileIO.Open

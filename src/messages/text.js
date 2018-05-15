@@ -2,16 +2,9 @@
 
 const privates = new WeakMap();
 
-export function handleCommand(message, command, logicNames, dialogueNames) {
-  if (message != null && !(message instanceof ShowText)) {
-    throw new Error("supplied message isn't of type ShowText");
-    return;
-  }
-  
-  if (message == null) {
-    message = new ShowText();
-    privates.set(message, { parts: [] });
-  }
+export function handleCommand(command, logicNames, dialogueNames) {
+  const message = new ShowText();
+  privates.set(message, { parts: [] });
   const parts = privates.get(message).parts;
   const newPart = new ShowTextPart(); 
   const priv = { text: command.display, index: command.characterIndex };

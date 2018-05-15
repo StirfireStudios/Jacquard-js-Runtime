@@ -47,28 +47,29 @@ function updateWithRuntimeData(state, runMode) {
   keepRunning = keepRunning && newState.options == null;
   while(keepRunning) {
     keepRunning = runMode !== "step";
-    runtime.run(runMode === "step");
-    if (runtime.currentMessage != null) {
-      switch(runtime.currentMessage.constructor.name) {
+    const message = runtime.run(runMode === "step");
+    debugger;
+    if (message != null) {
+      switch(message.constructor.name) {
         case "NodeChange":
-          handleNodeChange(newState.text, runtime.currentMessage);
+          handleNodeChange(newState.text, message);
           break;
         case "ShowText":
-          handleShowText(newState.text, runtime.currentMessage);
+          handleShowText(newState.text, message);
           break;
         case "Command":
-          handleCommand(newState.text, runtime.currentMessage);
+          handleCommand(newState.text, message);
           keepRunning = keepRunning && newState.runState !== "toCommand";
           break;
         case "Options":
-          handleOptions(newState, runtime.currentMessage, runtime);
+          handleOptions(newState, message, runtime);
           keepRunning = false;
           break;
         case "EndOfFile":
           keepRunning = false;
         case "Save":
         case "Load":
-          handleVariable(newState.text, runtime.currentMessage);
+          handleVariable(newState.text, message);
           break;  
         case "Halt": 
           newState.text.push({halted: true});
@@ -77,7 +78,7 @@ function updateWithRuntimeData(state, runMode) {
           break;
         default:
           console.log("Got message:");
-          console.log(runtime.currentMessage.constructor.name);
+          console.log(message.constructor.name);
           break;
       }
     }

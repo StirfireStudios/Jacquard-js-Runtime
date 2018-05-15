@@ -14,8 +14,9 @@
   "scripts": {
     "build": "babel src -d dist",
     "prepare": "yarn build",
-    "serveDoc": "documentation serve --watch src/** -f html",
-    "buildDoc": "documentation build src/** -f html -o docs"
+    "serveDoc": "documentation serve --watch src/** -f html --config documentation.yml",
+    "buildDocJSON": "documentation build src/** -f json -o docs/json --config documentation.yml",
+    "buildDoc": "documentation build src/** -f html -o docs --config documentation.yml"
   },
   "dependencies": {
     "utf-8": "^2.0.0"

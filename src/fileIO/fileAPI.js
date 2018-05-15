@@ -39,7 +39,8 @@ function ready(arrayBuffer) {
 
 export function canUse(fileInput) {
   if (!usable) return false;
-  return (fileInput instanceof File);
+  const isFile = fileInput instanceof File;
+  return isFile;
 }
 
 export function isType(stream) {
