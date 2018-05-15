@@ -48,7 +48,6 @@ function updateWithRuntimeData(state, runMode) {
   while(keepRunning) {
     keepRunning = runMode !== "step";
     const message = runtime.run(runMode === "step");
-    debugger;
     if (message != null) {
       switch(message.constructor.name) {
         case "NodeChange":
