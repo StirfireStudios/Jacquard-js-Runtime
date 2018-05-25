@@ -6,6 +6,8 @@ import Types from './types';
 
 const usable = File !== undefined;
 
+const bufferValid = window.Buffer != null;
+
 function loadSourceMap(tempArray) {
   try {
     const jsonString = UTF8.getStringFromBytes(tempArray);
@@ -33,14 +35,26 @@ function ready(arrayBuffer) {
     this.buffer = tempArray;
   } else if (typeString.startsWith("{\"")) {
     loadSourceMap.call(this, tempArray);
-    return;
+  }
+}
+
+function readyBuffer(buffer) {
+  if (this.length < 20) return;
+  const typeString = UTF8.getStringFromBytes(buffer, 0, 5);
+  if (typeString === "JQRDD") {
+    this.type = Types.Dialogue;
+    this.buffer = buffer;
+  } else if (typeString === "JQRDL") {
+    this.type = Types.Logic;
+    this.buffer = buffer;
   }
 }
 
 export function canUse(fileInput) {
   if (!usable) return false;
-  const isFile = fileInput instanceof File;
-  return isFile;
+  if (fileInput instanceof File) return true;
+  if (bufferValid) if (fileInput instanceof Buffer) return true;
+  return false;
 }
 
 export function isType(stream) {
@@ -52,9 +66,19 @@ export function open(fileInput) {
   return new Promise((resolve, reject) => {
     const streamInfo = {
       api: "fileAPI",
-      length: fileInput.size,
       type: Types.Unknown,
     };
+    if (bufferValid) {
+      if (fileInput instanceof Buffer) {
+        streamInfo.length = fileInput.length;
+        setTimeout(() => {
+          readyBuffer.call(streamInfo, fileInput);
+          resolve(streamInfo);
+        }, 0);
+        return;
+      }
+    }
+    streamInfo.length = fileInput.length;
     const reader = new FileReader();
     reader.onload = (event) => {
       ready.call(streamInfo, event.target.result);
