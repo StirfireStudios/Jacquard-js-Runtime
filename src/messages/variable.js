@@ -6,8 +6,8 @@ const privates = new WeakMap();
  * The base class for variable messages (not exported)
  */
 class base {
-  constructor(variableName, value) {
-    privates.set(this, {name: variableName, value: value});
+  constructor(variableIndex, variableName, value) {
+    privates.set(this, {index: variableIndex, name: variableName, value: value});
   }
 
   /**
@@ -19,6 +19,11 @@ class base {
    * @returns the value of the variable / to set the variable
    */
   get value() { return privates.get(this).value; }
+
+  /**
+   * @returns the index of the variable name in the table
+   */
+  get index() { return privates.get(this).index; }
 }
 
 /**

@@ -4,7 +4,7 @@ This is the Javascript Runtime for executing the Jacquard bytecode format
  
 ## Usage
 
-Install `jacquard-js-runtime` via your favourite javascript package tool.
+Install `jacquard-runtime` via your favourite javascript package tool.
 
 API Docs are [here](https://stirfirestudios.github.io/Jacquard-js-Runtime/)
 

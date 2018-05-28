@@ -5,9 +5,12 @@ function renderText(index, string) {
 }
 
 function renderCommand(index, args) {
+  console.log("rendering command");
+  console.log("ARGS");
+  console.log(args);
   const renderedArgs = [];
   for(let index = 0; index < args.length; index++) {
-    args.push(<span key={index} className="argument">{args[index]}</span>);
+    renderedArgs.push(<span key={index} className="argument">{args[index]}</span>);
   }
 
   return <div key={index} className="command">{renderedArgs}</div>;
