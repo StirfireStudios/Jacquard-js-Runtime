@@ -174,6 +174,16 @@ export class Runtime {
     return true;
   }
 
+  /** Reset the runtime to a base state */
+  reset() {
+    const priv = privates.get(this);
+    priv.logic = null;
+    priv.dialogue = null;
+    priv.sourceMap = null;
+    priv.errors = [];
+    priv.ready = false;
+  }
+
   /** Get the current instruction pointer
    * @returns {InstructionPointer}
    */
