@@ -2,13 +2,21 @@
 
 import * as FileIO from '../fileIO';
 
+function fixOperand(value) {
+  if (value == null) return 0;
+  return value;
+}
+
 function getLeftRightOperands(ipState, handle, offset) {
   const leftIndex = FileIO.ReadByte(handle, offset);
   const rightIndex = FileIO.ReadByte(handle, offset + leftIndex.length);
 
+  let left = fixOperand(ipState.args[leftIndex.data]);
+  let right = fixOperand(ipState.args[rightIndex.data]);
+
   return {
-    left: ipState.args[leftIndex.data],
-    right: ipState.args[rightIndex.data],
+    left: left,
+    right: right,
     length: leftIndex.length + rightIndex.length,
   }
 }

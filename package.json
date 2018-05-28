@@ -1,6 +1,6 @@
 {
   "name": "jacquard-runtime",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "a JS runtime for the Jacquard bytecode format",
   "main": "dist/index.js",
   "repository": "https://github.com/StirfireStudios/Jacquard-js-Runtime",
