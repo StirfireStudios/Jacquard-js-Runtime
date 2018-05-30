@@ -25,9 +25,12 @@ export function Return(ipState, handle, offset, logic) {
   const result = functionData(ipState.args, handle, offset);
   return {
     data: {
-      function: logic.functions[result.index],
-      args: result.args,
-      return: true,  
+      function: {
+        name: logic.functions[result.index],
+        index: result.index,
+        args: result.args,
+        return: true,  
+      }
     },
     length: result.length,
   }
@@ -37,9 +40,12 @@ export function NoReturn(ipState, handle, offset, logic) {
   const result = functionData(ipState.args, handle, offset);
   return {
     data: {
-      function: logic.functions[result.index],
-      args: result.args,
-      return: false,  
+      function: {
+        name: logic.functions[result.index],
+        index: result.index,
+        args: result.args,
+        return: false,
+      }
     },
     length: result.length,
   }

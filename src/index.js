@@ -28,6 +28,7 @@ function checkReady() {
     priv.state = {
       variables: {},
       visited: [],
+      waitForReturn: false,
     }
     priv.ready = true;
   }
@@ -44,6 +45,15 @@ function addShowText(command) {
 
   if (priv.showText == null) priv.showText = [];
   priv.showText.push(textLine);
+}
+
+function handleVisited(message) {
+  if (message.name !== 'visited') return false;
+  if (!message.returnRequired) return true;
+
+  const { IP, state } = privates.get(this);
+  IP.args.unshift(state.visited.indexOf(message.args[0]) !== -1);
+  return true;
 }
 
 /** This class represents a Jacquard bytecode runtime
@@ -117,7 +127,7 @@ export class Runtime {
    */
   run(singleInstruction) {
     const priv = privates.get(this);
-    while(!singleInstruction && !priv.IP.halted) {
+    while(!singleInstruction && !priv.IP.halted && !priv.state.waitForReturn) {
       const command = VM.execute(priv.state, priv.IP, priv.logic, priv.dialogue);
       if (command == null) {
       } else if (command.enterNode != null) {
@@ -131,9 +141,10 @@ export class Runtime {
           return new Messages.Variable.Save(command.var.index, command.var.name, command.var.value);
         }
       } else if (command.function != null) {
-        console.log("Run function:");
-        console.log(command.function); 
-        return true;
+        const funcMessage = Messages.Function.handleCommand(command);
+        if (handleVisited.call(this, funcMessage)) continue;
+        priv.state.waitForReturn = true;
+        return funcMessage;
       } else if (command.options != null) {
         return Messages.Options.handleCommand(command);
       } else if (command.display != null) {
@@ -151,6 +162,18 @@ export class Runtime {
 
     return null;
   }  
+
+  /**
+   * Return the value for the currently outstanding function call
+   * @param {*} value the value to feed into the runtime 
+   */
+  functionReturnValue(value) {
+    const { state, IP }  = privates.get(this);
+    if (state == null) return;
+    if (!state.waitForReturn) return;
+    state.waitForReturn = false;
+    IP.args.unshift(value);
+  }
 
   /** Change the current instruction pointer to another one as specified.
    * @param {InstructionPointer} newIP 

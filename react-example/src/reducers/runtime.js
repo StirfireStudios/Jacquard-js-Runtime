@@ -1,23 +1,24 @@
 import { createReducer } from 'redux-act';
-import * as JacquardRuntime from '../jacquard-js-runtime'
+import { FileIO, Messages, Runtime } from '../jacquard-js-runtime'
 
 import * as DataActions from '../actions/data';
 import * as RuntimeActions from '../actions/runtime';
 
 import handleShowText from './runtimeHandlers/showText';
 import handleCommand from './runtimeHandlers/command';
+import handleFunction from './runtimeHandlers/function';
 import handleOptions from './runtimeHandlers/options';
 import handleNodeChange from './runtimeHandlers/nodeChange';
 import handleVariable from './runtimeHandlers/variable';
 
-const runtime = new JacquardRuntime.Runtime();
+const runtime = new Runtime();
 
 function convertType(textType) {
-  if (textType === 'logic') return JacquardRuntime.FileIO.Types.Logic;
-  if (textType === 'dialogue') return JacquardRuntime.FileIO.Types.Dialogue;
-  if (textType === 'sourceMap') return JacquardRuntime.FileIO.Types.SourceMap;
+  if (textType === 'logic') return FileIO.Types.Logic;
+  if (textType === 'dialogue') return FileIO.Types.Dialogue;
+  if (textType === 'sourceMap') return FileIO.Types.SourceMap;
 
-  return JacquardRuntime.FileIO.Types.Unknown;
+  return FileIO.Types.Unknown;
 }
 
 function updateWithRuntimeData(state, runMode) {
@@ -29,6 +30,7 @@ function updateWithRuntimeData(state, runMode) {
       variables: [],
       variableState: {},
       functions: [],
+      currentFunc: null,
       nodeNames: [],
       nodeHistory: [],
       text: [],
@@ -44,40 +46,43 @@ function updateWithRuntimeData(state, runMode) {
   };
    
   let keepRunning = newState.ready && newState.runMode != null;
-  keepRunning = keepRunning && newState.options == null;
+  keepRunning = keepRunning && newState.options == null && newState.currentFunc == null;
   while(keepRunning) {
     keepRunning = runMode !== "step";
     const message = runtime.run(runMode === "step");
     if (message != null) {
-      switch(message.constructor.name) {
-        case "NodeChange":
+      switch(message.constructor) {
+        case Messages.NodeChange:
           handleNodeChange(newState.text, message);
           break;
-        case "Show":
+        case Messages.Text.Show:
           handleShowText(newState.text, message);
           break;
-        case "Command":
+        case Messages.Command:
           handleCommand(newState.text, message);
           keepRunning = keepRunning && newState.runState !== "toCommand";
           break;
-        case "Options":
+        case Messages.Options:
           handleOptions(newState, message, runtime);
           keepRunning = false;
           break;
-        case "EndOfFile":
+        case Messages.EndOfFile:
           keepRunning = false;
-        case "Save":
-        case "Load":
+        case Messages.Variable.Save:
+        case Messages.Variable.Load:
           handleVariable(newState.text, message);
           break;  
-        case "Halt": 
+        case Messages.Halt: 
           newState.text.push({halted: true});
           newState.halted = true;
           keepRunning = false;
           break;
+        case Messages.Function:
+          if (handleFunction(newState, message)) keepRunning = false; 
+          break;
         default:
           console.log("Got message:");
-          console.log(message.constructor.name);
+          console.log(message);
           break;
       }
     }
@@ -132,11 +137,26 @@ export default createReducer({
       return state;
     }
   },
+  [RuntimeActions.FuncValue]: (state, value) => {
+    if (value.toLowerCase() === 'true') {
+      value = true;
+    } else if (value.toLowerCase() === 'false') {
+      value = false;
+    } else if (parseInt(value, 10).toString() === value) {
+      value = parseInt(value, 10);
+    } else if (parseFloat(value).toString() === value) {
+      value = parseFloat(value);
+    }
+    state.currentFunc = null;
+    runtime.functionReturnValue(value);
+    return updateWithRuntimeData(state);
+  },
 }, {
   ready: false,
   active: false,
   runMode: null,
   options: null,
+  currentFunc: null,
   characters: [],
   variables: [],
   functions: [],

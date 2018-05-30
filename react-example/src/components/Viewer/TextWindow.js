@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 
+import FuncDialog from './FuncDialog';
+
 function renderText(index, string) {
   return <div key={index} className="text">{string}</div>;
 }
 
 function renderCommand(index, args) {
-  console.log("rendering command");
-  console.log("ARGS");
-  console.log(args);
   const renderedArgs = [];
   for(let index = 0; index < args.length; index++) {
     renderedArgs.push(<span key={index} className="argument">{args[index]}</span>);
@@ -82,12 +81,24 @@ function renderOptions() {
   return options;
 }
 
+function renderFuncReturn() {
+  if (this.props.currentFunc == null) return null;
+  return (
+    <FuncDialog
+      name={this.props.currentFunc.name}
+      args={this.props.currentFunc.args}
+      submit={this.props.funcCallReturn}
+    />
+  );
+}
+
 export default class TextWindow extends Component {
   render() {
     return (
       <div key={this.props.key} className={this.props.className}>
         {renderTextArray.call(this)}
         {renderOptions.call(this)}
+        {renderFuncReturn.call(this)}
       </div>
     )
   }
