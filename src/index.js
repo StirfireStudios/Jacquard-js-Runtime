@@ -28,6 +28,7 @@ function checkReady() {
     priv.state = {
       variables: {},
       visited: [],
+      waitForReturn: false,
     }
     priv.ready = true;
   }
@@ -126,7 +127,7 @@ export class Runtime {
    */
   run(singleInstruction) {
     const priv = privates.get(this);
-    while(!singleInstruction && !priv.IP.halted) {
+    while(!singleInstruction && !priv.IP.halted && !priv.state.waitForReturn) {
       const command = VM.execute(priv.state, priv.IP, priv.logic, priv.dialogue);
       if (command == null) {
       } else if (command.enterNode != null) {
@@ -141,7 +142,8 @@ export class Runtime {
         }
       } else if (command.function != null) {
         const funcMessage = Messages.Function.handleCommand(command);
-        if (handleVisited.call(this, funcMessage)) continue; 
+        if (handleVisited.call(this, funcMessage)) continue;
+        priv.state.waitForReturn = true;
         return funcMessage;
       } else if (command.options != null) {
         return Messages.Options.handleCommand(command);
@@ -160,6 +162,18 @@ export class Runtime {
 
     return null;
   }  
+
+  /**
+   * Return the value for the currently outstanding function call
+   * @param {*} value the value to feed into the runtime 
+   */
+  functionReturnValue(value) {
+    const { state, IP }  = privates.get(this);
+    if (state == null) return;
+    if (!state.waitForReturn) return;
+    state.waitForReturn = false;
+    IP.args.unshift(value);
+  }
 
   /** Change the current instruction pointer to another one as specified.
    * @param {InstructionPointer} newIP 
