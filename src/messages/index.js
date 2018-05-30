@@ -1,6 +1,7 @@
 'use strict';
 
 import * as Command from './command';
+import * as Function from './function';
 import EndOfFile from './endoffile';
 import Halt from './halt';
 import NodeChange from './nodeChange';
@@ -11,6 +12,7 @@ import * as Variable from './variable';
 const ExternalMessages = {
   Command: Command.Command,
   EndOfFile: EndOfFile,
+  Function: Function.Function,
   Halt: Halt,
   NodeChange: NodeChange,
   Options: Options.Options,
@@ -21,6 +23,7 @@ const ExternalMessages = {
 export {
   Command, 
   ExternalMessages, 
+  Function,
   EndOfFile, 
   Halt,
   NodeChange,
