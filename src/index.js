@@ -46,6 +46,15 @@ function addShowText(command) {
   priv.showText.push(textLine);
 }
 
+function handleVisited(message) {
+  if (message.name !== 'visited') return false;
+  if (!message.returnRequired) return true;
+
+  const { IP, state } = privates.get(this);
+  IP.args.unshift(state.visited.indexOf(message.args[0]) !== -1);
+  return true;
+}
+
 /** This class represents a Jacquard bytecode runtime
 */
 export class Runtime {
@@ -131,9 +140,9 @@ export class Runtime {
           return new Messages.Variable.Save(command.var.index, command.var.name, command.var.value);
         }
       } else if (command.function != null) {
-        console.log("Run function:");
-        console.log(command.function); 
-        return true;
+        const funcMessage = Messages.Function.handleCommand(command);
+        if (handleVisited.call(this, funcMessage)) continue; 
+        return funcMessage;
       } else if (command.options != null) {
         return Messages.Options.handleCommand(command);
       } else if (command.display != null) {
