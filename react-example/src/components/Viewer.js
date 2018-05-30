@@ -140,6 +140,8 @@ class Viewer extends Component {
           text={this.props.text}
           options={this.props.options}
           optionSelect={RuntimeActions.OptionSelect}
+          currentFunc={this.props.currentFunc}
+          funcCallReturn={RuntimeActions.FuncValue}
         />
         {renderButtons.call(this)}        
       </div>
@@ -152,6 +154,7 @@ function mapStateToProps(state) {
     ready: state.Runtime.ready,
     started: state.Runtime.waitingFor !== "start",
     disablePlayback: (state.Runtime.options !== null) || (state.Runtime.halted),
+    currentFunc: state.Runtime.currentFunc,
     options: state.Runtime.options,
     characters: state.Runtime.characters,
     showCharacters: state.View.showCharacters,
