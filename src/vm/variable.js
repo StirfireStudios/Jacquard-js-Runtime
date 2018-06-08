@@ -5,7 +5,7 @@ import * as FileIO from '../fileIO';
 export function Set(state, ipState, handle, offset, logic) {
   const varIndex = FileIO.ReadVarInt(handle, offset);
   const varName = logic.variables[varIndex.data];
-  const newValue = ipState.args[ipState.args.length - 1];
+  const newValue = ipState.args[0];
   state.variables[varName] = newValue;
   return {
     length: varIndex.length, 
