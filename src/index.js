@@ -47,13 +47,20 @@ function addShowText(command) {
   priv.showText.push(textLine);
 }
 
-function handleVisited(message) {
-  if (message.name !== 'visited') return false;
-  if (!message.returnRequired) return true;
-
+function handleFunc(command) {
   const { IP, state } = privates.get(this);
-  IP.args.unshift(state.visited.indexOf(message.args[0]) !== -1);
-  return true;
+  if (command.function.name !== 'visited') {
+    state.waitForReturn = command.function.return;
+    return Messages.Function.handleCommand(command);
+  }
+  let nodeName = null;
+  if (command.function.args.length > 0) nodeName = command.function.args[0];
+  const visited = state.visited.indexOf(nodeName) !== -1;
+  IP.args.unshift(visited);
+  command.function.return = false;
+  command.function.returnValue = visited;
+  state.waitForReturn = false;
+  return Messages.Function.handleCommand(command);
 }
 
 /** This class represents a Jacquard bytecode runtime
@@ -141,10 +148,7 @@ export class Runtime {
           return new Messages.Variable.Save(command.var.index, command.var.name, command.var.value);
         }
       } else if (command.function != null) {
-        const funcMessage = Messages.Function.handleCommand(command);
-        if (handleVisited.call(this, funcMessage)) continue;
-        priv.state.waitForReturn = true;
-        return funcMessage;
+        return handleFunc.call(this, command);
       } else if (command.options != null) {
         return Messages.Options.handleCommand(command);
       } else if (command.display != null) {
