@@ -21,7 +21,7 @@ function convertType(textType) {
   return FileIO.Types.Unknown;
 }
 
-function updateWithRuntimeData(state, runMode) {
+function updateWithRuntimeData(state, runMode, returnedFuncObj) {
   if (!runtime.ready) {
     return {
       ...state,
@@ -45,6 +45,8 @@ function updateWithRuntimeData(state, runMode) {
     text: state.text.map((item) => (item)),
   };
    
+  if (returnedFuncObj != null) newState.text.push({function: returnedFuncObj});
+
   let keepRunning = newState.ready && newState.runMode != null;
   keepRunning = keepRunning && newState.options == null && newState.currentFunc == null;
   while(keepRunning) {
@@ -147,9 +149,11 @@ export default createReducer({
     } else if (parseFloat(value).toString() === value) {
       value = parseFloat(value);
     }
+    state.currentFunc.returnValue = value;
+    const returnFuncObj = state.currentFunc;
     state.currentFunc = null;
     runtime.functionReturnValue(value);
-    return updateWithRuntimeData(state);
+    return updateWithRuntimeData(state, state.runMode, returnFuncObj);
   },
 }, {
   ready: false,

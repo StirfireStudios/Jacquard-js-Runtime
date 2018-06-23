@@ -8,6 +8,7 @@ export function handleCommand(command) {
     name: command.function.name,
     index: command.function.index,
     args: command.function.args.map((item) => (item)),
+    returnValue: command.function.returnValue,
     returnRequired: command.function.return,
   });
   return message;
@@ -39,6 +40,12 @@ export class Function {
    * @return {any[]} arguments (could be of any type)
    */
   get args() { return privates.get(this).args; }
+
+  /**
+   * If this function already has a value that was applied 
+   * (usually means the function was "Visited")
+   */
+  get returnValue() { return privates.get(this).returnValue; }
 
   /**
    * If this function requires a value to be provided to the runtime
