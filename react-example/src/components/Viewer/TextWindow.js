@@ -31,7 +31,7 @@ function renderSelectedOption(index, selectedOption) {
 }
 
 function renderVariableChange(index, variableData) {
-  let type = typeof(variableData.value);
+  const type = typeof(variableData.value);
   if (variableData.type === "save") {
     return <div key={index} className="variableSave">{variableData.name} is now {variableData.value} ({type})</div>;
   } else {
@@ -39,6 +39,23 @@ function renderVariableChange(index, variableData) {
   }
 }
 
+function renderFunction(index, functionData) {
+  const { name, args, returnValue, returnRequired } = functionData;
+  const parts = [];
+  parts.push(<span key="name">Function {name} called</span>);
+  parts.push(<span key="args">Args: {args.join(",")}</span>);
+  if (returnValue != null) {
+    const type = typeof(functionData.returnValue);
+    let value = returnValue;
+    if (type === 'boolean') value = value ? "true" : "false";
+    parts.push(<span key="returnValue">Value: {value} ({type})</span>);
+  } 
+  if (returnRequired && returnValue != null) {
+    parts.push(<span key="returnRequired">Value from user</span>);
+  }
+
+  return <div key={index}>{parts}</div>
+}
 
 function renderTextArray() {
   const renderedText = [];
@@ -54,6 +71,8 @@ function renderTextArray() {
       renderedText.push(renderSelectedOption(index, text.optionSelected));
     } else if (text.variable != null) {
       renderedText.push(renderVariableChange(index, text.variable));
+    } else if (text.function != null) {
+      renderedText.push(renderFunction(index, text.function));
     }
   }
   return renderedText;
