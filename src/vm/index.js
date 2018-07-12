@@ -149,8 +149,8 @@ export function execute(state, ipState, logic, dialogue) {
       retValue = { data: { stop: `Unknown Opcode ${opCodeInfo.data}` } };
   }
 
-  if (retValue != null && retValue.length) offset += retValue.length;
-  if (retValue != null && retValue.offset) offset = retValue.offset + start;
+  if (retValue != null && retValue.length != null) offset += retValue.length;
+  if (retValue != null && retValue.offset != null) offset = retValue.offset + start;
 
   if (inDialogue) {
     if (offset == -1) {
