@@ -67,9 +67,9 @@ export function Equal(ipState, handle, offset) {
 }
 
 export function Not(ipState, handle, offset) {
-  const operand = getOperand(handle, offset);
-  ipState.args.unshift(!operands.value);
-  return { length: operands.length };
+  const operand = getOperand(ipState, handle, offset);
+  ipState.args.unshift(!operand.value);
+  return { length: operand.length };
 }
 
 export function And(ipState, handle, offset) {
