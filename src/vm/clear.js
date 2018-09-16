@@ -19,8 +19,6 @@ function clearStack(ipState, arrayName, handle, offset) {
     return { length: length };
   }
 
-  debugger;
-
   while(orgArray.length > startIndexInfo.data && lengthInfo.data > 0) {
     orgArray.splice(startIndexInfo.data, 1);
     lengthInfo.data -= 1;
