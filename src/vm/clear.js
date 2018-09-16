@@ -2,7 +2,6 @@
 
 import * as FileIO from '../fileIO';
 
-
 function clearStack(ipState, arrayName, handle, offset) {
   let length = 0;
   const startIndexInfo = FileIO.ReadByte(handle, offset);
@@ -12,17 +11,19 @@ function clearStack(ipState, arrayName, handle, offset) {
   length += lengthInfo.length;
 
   const orgArray = ipState[arrayName];
-  ipState[arrayName] = [];
 
-  for(let index = 0; index < orgArray.length; index++) {
-    if (index < startIndexInfo.data) {
-      ipState[arrayName].push(orgArray[index]);
-      continue;
-    } 
-    if (lengthInfo.data == 255) break;
-    if (index > startIndexInfo.data + lengthInfo.data) {
-      ipState[arrayName].push(orgArray[index]);
-    }
+  if (lengthInfo.data == 0) return {length: length };
+
+  if (lengthInfo.data == 255) {
+    orgArray.splice(startIndexInfo.data, orgArray.length - startIndexInfo.data);
+    return { length: length };
+  }
+
+  debugger;
+
+  while(orgArray.length > startIndexInfo.data && lengthInfo.data > 0) {
+    orgArray.splice(startIndexInfo.data, 1);
+    lengthInfo.data -= 1;
   }
 
   return { length: length };
