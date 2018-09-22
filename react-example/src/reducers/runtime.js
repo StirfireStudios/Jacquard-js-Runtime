@@ -4,6 +4,7 @@ import { FileIO, Messages, Runtime } from '../jacquard-js-runtime'
 import * as DataActions from '../actions/data';
 import * as RuntimeActions from '../actions/runtime';
 
+import handleDialogSegment from './runtimeHandlers/handleDialogSegment';
 import handleShowText from './runtimeHandlers/showText';
 import handleCommand from './runtimeHandlers/command';
 import handleFunction from './runtimeHandlers/function';
@@ -57,6 +58,9 @@ function updateWithRuntimeData(state, runMode, returnedFuncObj) {
         case Messages.NodeChange:
           handleNodeChange(newState.text, message);
           break;
+        case Messages.DialogueSegment:
+          handleDialogSegment(newState.text, message);
+          break;
         case Messages.Text.Show:
           handleShowText(newState.text, message);
           break;
@@ -69,8 +73,8 @@ function updateWithRuntimeData(state, runMode, returnedFuncObj) {
           keepRunning = false;
           break;
         case Messages.EndOfFile:
-          keepRunning = false;
-        case Messages.Variable.Save:
+          keepRunning = false; // eslint-disable-next-line
+        case Messages.Variable.Save: 
         case Messages.Variable.Load:
           handleVariable(newState.text, message);
           break;  
@@ -84,7 +88,7 @@ function updateWithRuntimeData(state, runMode, returnedFuncObj) {
           break;
         default:
           console.log("Got message:");
-          console.log(message);
+          console.log(message.constructor.name);
           break;
       }
     }

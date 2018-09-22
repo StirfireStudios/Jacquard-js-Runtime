@@ -1,6 +1,7 @@
 'use strict';
 
 import * as Command from './command';
+import * as DialogueSegment from './dialogueSegment';
 import * as Function from './function';
 import EndOfFile from './endoffile';
 import Halt from './halt';
@@ -11,6 +12,7 @@ import * as Variable from './variable';
 
 const ExternalMessages = {
   Command: Command.Command,
+  DialogueSegment: DialogueSegment.DialogueSegment,
   EndOfFile: EndOfFile,
   Function: Function.Function,
   Halt: Halt,
@@ -22,6 +24,7 @@ const ExternalMessages = {
 
 export {
   Command, 
+  DialogueSegment,
   ExternalMessages, 
   Function,
   EndOfFile, 

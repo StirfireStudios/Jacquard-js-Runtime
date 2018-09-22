@@ -63,6 +63,33 @@ function handleFunc(command) {
   return Messages.Function.handleCommand(command);
 }
 
+function generateMessage(command, priv) {
+  if (command.enterNode != null) {
+    const nodeName = priv.logic.nodeNames[command.enterNode]
+    priv.state.visited.push(nodeName);
+    return new Messages.NodeChange(nodeName);
+  } else if (command.var != null) {
+    if (command.var.type === 'get') {
+      return new Messages.Variable.Load(command.var.index, command.var.name, command.var.value);
+    } else if (command.var.type === 'set') {
+      return new Messages.Variable.Save(command.var.index, command.var.name, command.var.value);
+    }
+  } else if (command.function != null) {
+    return handleFunc.call(this, command);
+  } else if (command.options != null) {
+    return Messages.Options.handleCommand(command);
+  } else if (command.external === "runCommand") {
+    return Messages.Command.handleCommand(command);
+  } else if (command.external === "text") {
+    return Messages.Text.handleCommand(command);
+  } else if (command.endOfFile != null) {
+    return new Messages.EndOfFile();
+  } else if (command.dialogueBlock === true) {
+    const messages = command.datas.map((value) => generateMessage(value, priv));
+    return Messages.DialogueSegment.handleCommand(command.id, command.characterIndex, messages);
+  }
+}
+
 /** This class represents a Jacquard bytecode runtime
 */
 export class Runtime {
@@ -135,31 +162,8 @@ export class Runtime {
   run(singleInstruction) {
     const priv = privates.get(this);
     while(!singleInstruction && !priv.IP.halted && !priv.state.waitForReturn) {
-      const command = VM.execute(priv.state, priv.IP, priv.logic, priv.dialogue);
-      if (command == null) {
-      } else if (command.enterNode != null) {
-        const nodeName = priv.logic.nodeNames[command.enterNode]
-        priv.state.visited.push(nodeName);
-        return new Messages.NodeChange(nodeName);
-      } else if (command.var != null) {
-        if (command.var.type === 'get') {
-          return new Messages.Variable.Load(command.var.index, command.var.name, command.var.value);
-        } else if (command.var.type === 'set') {
-          return new Messages.Variable.Save(command.var.index, command.var.name, command.var.value);
-        }
-      } else if (command.function != null) {
-        return handleFunc.call(this, command);
-      } else if (command.options != null) {
-        return Messages.Options.handleCommand(command);
-      } else if (command.display != null) {
-        return Messages.Text.handleCommand(
-          command, priv.logic.characters, priv.dialogue.characters
-        );
-      } else if (command.external != null) {
-        return Messages.Command.handleCommand(command);
-      } else if (command.endOfFile != null) {
-        return new Messages.EndOfFile();
-      }
+      const result = VM.execute(priv.state, priv.IP, priv.logic, priv.dialogue);
+      if (result != null) return generateMessage(result, priv);
     }
 
     if (priv.IP.halted) return new Messages.Halt();

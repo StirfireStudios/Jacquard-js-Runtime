@@ -44,12 +44,13 @@ export function execute(state, ipState, logic, dialogue) {
       retValue = Text.Show(state, ipState);
       break;
     case 65:
-      retValue = Command.Run(ipState);
+      retValue = Command.Run(state, ipState);
       break;
     case 129:
-      retValue = DialogueBlock.Show(state, ipState, handle, offset, dialogue);
+      retValue = DialogueBlock.Start(state, ipState, handle, offset, dialogue);
       break;
-    case 193: // Dialog Block End
+    case 193:
+      retValue = DialogueBlock.Stop(state);
       offset = -1;
       break;
     case 2:
