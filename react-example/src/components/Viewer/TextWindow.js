@@ -21,11 +21,19 @@ function renderNodeEntry(index, nodeName) {
 
 function renderSelectedOption(index, selectedOption) {
   const text = [];
-  for(let index = 0; index < selectedOption.text.length; index++) {
-    const textLine = selectedOption.text[index];
-    if (textLine.text == null) continue;
-    text.push(<span key={index} className="optionText">{textLine.text}</span>);
+  if (selectedOption.segments.length == 0) {
+    return <div key={index} className="selectedOption">Unknown</div>;
   }
+
+  let optionText = "Unknown";
+  for(let index = 0; index < selectedOption.segments[0].text.length; index++) {
+    let text = selectedOption.segments[0].text[index];
+    if (text.text != null) {
+      optionText = text.text;
+      break;
+    }
+  }
+  text.push(<span key={index} className="optionText">{optionText}</span>);
 
   return <div key={index} className="selectedOption">{text}</div>;
 }
@@ -57,27 +65,46 @@ function renderFunction(index, functionData) {
   return <div key={index}>{parts}</div>
 }
 
+function renderDialogSegment(index, segmentData) {
+  const parts = [];
+  parts.push(<span key="segment">Segment: {segmentData.dialogSegment}</span>)
+  if (segmentData.characterIndex > 0) {
+    parts.push(<span key="char">Character</span>)
+  }
+  const subParts = [];
+  for(let index = 0; index < segmentData.text.length; index++) {
+    var part = renderTextType(segmentData.text[index], index);
+    if (part != null) subParts.push(part);
+  }
+  parts.push(<div key="parts">{subParts}</div>);
+
+  return <div key={index}>{parts}</div>
+}
+
+function renderTextType(textType, index) {
+  if (textType.command != null) {
+    return renderCommand(index, textType.command);
+  } else if (textType.nodeEntered != null) {
+    return renderNodeEntry(index, textType.nodeEntered);
+  } else if (textType.optionSelected != null) {
+    return renderSelectedOption(index, textType.optionSelected);
+  } else if (textType.variable != null) {
+    return renderVariableChange(index, textType.variable);
+  } else if (textType.dialogSegment != null) {
+    return renderDialogSegment(index, textType);
+  } else if (textType.text != null) {
+    return renderText(index, textType.text);
+  }
+  return null;
+}
+
 function renderTextArray() {
   const renderedText = [];
   for(let index = 0; index < this.props.text.length; index++) {
-    const text = this.props.text[index];
-    if (text.text != null) {
-      renderedText.push(renderText(index, text.text));
-    } else if (text.command != null) {
-      renderedText.push(renderCommand(index, text.command));
-    } else if (text.nodeEntered != null) {
-      renderedText.push(renderNodeEntry(index, text.nodeEntered));
-    } else if (text.optionSelected != null) {
-      renderedText.push(renderSelectedOption(index, text.optionSelected));
-    } else if (text.variable != null) {
-      renderedText.push(renderVariableChange(index, text.variable));
-    } else if (text.function != null) {
-      renderedText.push(renderFunction(index, text.function));
-    }
+    renderedText.push(renderTextType(this.props.text[index]));
   }
   return renderedText;
 }
-
 
 function renderOptions() {
   const options = [];
@@ -88,9 +115,20 @@ function renderOptions() {
   if (this.props.options != null) {
     for(let option of this.props.options) {
       const action = optionSelect.bind(null, option);
+      let optionText = null;
+      for(var segment of option.segments) {
+        for (var text of segment.text) {
+          if (text.text != null) {
+            optionText = text.text;
+            break;
+          } 
+        }
+        if (optionText != null) break;
+      }
+      if (optionText == null) optionText = "unknown";
       options.push(
         <div key={optionIndex}>
-          <button onClick={action}>{option.text[0].text}</button>
+          <button onClick={action}>{optionText}</button>
         </div>
       )
       optionIndex++;
