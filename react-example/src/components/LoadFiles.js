@@ -2,7 +2,6 @@ import { connect } from 'react-redux';
 import React, { Component } from 'react';
 import ReactFileReader  from 'react-file-reader';
 
-import * as DataActions from '../actions/data';
 import * as DataAsync from '../actionsAsync/data';
 import * as RuntimeActions from '../actions/runtime';
 

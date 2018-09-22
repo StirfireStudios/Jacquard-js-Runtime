@@ -1,6 +1,5 @@
 import { createReducer } from 'redux-act';
 
-import * as RuntimeActions from '../actions/runtime';
 import * as ViewActions from '../actions/view';
 
 export default createReducer({

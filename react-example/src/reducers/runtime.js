@@ -69,8 +69,8 @@ function updateWithRuntimeData(state, runMode, returnedFuncObj) {
           keepRunning = false;
           break;
         case Messages.EndOfFile:
-          keepRunning = false;
-        case Messages.Variable.Save:
+          keepRunning = false; // eslint-disable-next-line
+        case Messages.Variable.Save: 
         case Messages.Variable.Load:
           handleVariable(newState.text, message);
           break;  
