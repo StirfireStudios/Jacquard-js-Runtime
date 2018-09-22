@@ -7,7 +7,8 @@ export function Entry(handle, offset) {
   return {
     length: nodeIndexInfo.length,
     data: {
-      enterNode: nodeIndexInfo.data,
+      enterNode: true,
+      index: nodeIndexInfo.data,
     },
   } 
 }

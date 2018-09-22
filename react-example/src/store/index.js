@@ -1,11 +1,10 @@
 import { createStore, compose } from 'redux';
-import DevTools from '../components/DevTools';
 
 import rootReducer from '../reducers'
 
 let enhancer = null
 if (process.env.NODE_ENV !== 'production') {
-  enhancer = compose(DevTools.instrument())
+  enhancer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 }
 
 export default function configureStore(initialState) {
@@ -13,7 +12,7 @@ export default function configureStore(initialState) {
     return createStore(rootReducer, initialState);
   }
   
-  const store = createStore(rootReducer, initialState, enhancer)
+  const store = createStore(rootReducer, initialState, enhancer())
 
   if (module.hot) {
     // Enable Webpack hot module replacement for reducers

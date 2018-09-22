@@ -17,8 +17,10 @@ export function Load(state, ipState, handle, offset, logic) {
   const varIndex = FileIO.ReadVarInt(handle, offset);
   const varName = logic.variables[varIndex.data];
   ipState.args.unshift(state.variables[varName]);
-  return {
-    length: varIndex.length, 
-    data: { var: { type: 'get', name: varName, value: ipState.args[0], index: varIndex.data }},
-  };
+
+  const data = { var: { type: 'get', name: varName, value: ipState.args[0], index: varIndex.data } };
+ 
+  if (state.dialogBlock == null) return { length: varIndex.length, data: data };
+  state.dialogBlock.datas.push(data);
+  return { length: varIndex.length };
 }

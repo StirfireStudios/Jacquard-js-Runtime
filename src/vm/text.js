@@ -3,11 +3,12 @@
 import * as FileIO from '../fileIO';
 
 export function Show(state, ipState) {
-  return {
-    length: 0,
-    data: {
-      display: ipState.args.reverse().join(""),
-      characterIndex: state.characterIndex,
-    }
+  const data = {
+    external: "text", 
+    display: ipState.args.reverse().join("")
   };
+
+  if (state.dialogBlock == null) return { length: 0, data: data };
+  state.dialogBlock.datas.push(data);
+  return { length: 0 };
 }
