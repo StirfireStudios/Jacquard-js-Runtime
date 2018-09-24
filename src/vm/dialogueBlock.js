@@ -4,8 +4,9 @@ import * as FileIO from '../fileIO';
 
 function byteArrayToNumber(array) {
   let value = 0;
-  array.forEach((elem, index) => {
-    value *= 256^index
+  array.reverse().forEach((elem, index) => {
+    if (elem == 0) return;
+    value *= 256^index;
     value += elem
   });
   return value;
