@@ -4,11 +4,14 @@ import * as FileIO from '../fileIO';
 
 function byteArrayToNumber(array) {
   let value = 0;
-  array.reverse().forEach((elem, index) => {
-    if (elem == 0) return;
-    value *= 256^index;
-    value += elem
-  });
+  let power = -1;
+  for(let index = array.length - 1; index >= 0; index--){
+    power++;
+    const elem = array[index];
+    if (elem == 0) continue;
+    value *= Math.pow(256, power);
+    value += elem;
+  }
   return value;
 }
 
