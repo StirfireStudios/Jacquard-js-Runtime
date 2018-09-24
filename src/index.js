@@ -65,7 +65,7 @@ function handleFunc(command) {
 
 function generateMessage(command, priv) {
   if (command.enterNode != null) {
-    const nodeName = priv.logic.nodeNames[command.enterNode]
+    const nodeName = priv.logic.nodeNames[command.index]
     priv.state.visited.push(nodeName);
     return new Messages.NodeChange(nodeName);
   } else if (command.var != null) {
